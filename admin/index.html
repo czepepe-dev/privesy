@@ -1,12 +1,71 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Admin</title>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  </head>
-  <body>
-    <script src="config.yml" type="text/yaml"></script>
-    <script src="https://unpkg.com/netlify-cms@^2.10.0/dist/netlify-cms.js"></script>
-  </body>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Administrace | Přívěsy z Nizozemska</title>
+  <style>
+    :root{font-family:Arial,sans-serif;color:#1f2937;background:#f5f7f8}
+    *{box-sizing:border-box} body{margin:0}
+    header{background:#fff;border-bottom:1px solid #ddd;padding:18px 24px;display:flex;justify-content:space-between;align-items:center}
+    header strong{font-size:20px}.wrap{max-width:1100px;margin:25px auto;padding:0 16px}
+    .panel{background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px;margin-bottom:18px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{font-weight:700;font-size:14px;display:block;margin-bottom:6px}
+    input,select,textarea{width:100%;padding:10px;border:1px solid #bbb;border-radius:6px;font:inherit}
+    textarea{min-height:180px;resize:vertical}.full{grid-column:1/-1}
+    button{padding:10px 16px;border:0;border-radius:6px;cursor:pointer;font-weight:700}
+    .primary{background:#176b3a;color:white}.secondary{background:#e8edf0}.danger{background:#b42318;color:white}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .product{border-top:1px solid #ddd;padding:14px 0;display:grid;grid-template-columns:90px 1fr auto;gap:14px;align-items:center}
+    .product img{width:90px;height:70px;object-fit:cover;border-radius:6px}.muted{color:#667085;font-size:13px}
+    #login{max-width:430px;margin:12vh auto}.hidden{display:none}.status{margin:10px 0;font-weight:700}
+    .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.thumb{width:90px;height:70px;object-fit:cover;border-radius:5px;border:1px solid #ddd}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}.product{grid-template-columns:70px 1fr}.product .actions{grid-column:1/-1}.product img{width:70px;height:55px}}
+  </style>
+</head>
+<body>
+<header><strong>Přívěsy z Nizozemska – Administrace</strong><a href="/" class="muted">Zpět na web</a></header>
+<main class="wrap">
+  <section id="login" class="panel">
+    <h2>Přihlášení</h2>
+    <form id="loginForm">
+      <label>Heslo</label><input id="password" type="password" autocomplete="current-password" required>
+      <div class="row" style="margin-top:12px"><button class="primary">Přihlásit</button></div>
+      <div id="loginStatus" class="status"></div>
+    </form>
+  </section>
+
+  <section id="app" class="hidden">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between">
+        <h2 id="formTitle">Nový přívěs</h2>
+        <div class="row"><button class="secondary" id="newBtn">+ Nový přívěs</button><button class="secondary" id="logoutBtn">Odhlásit</button></div>
+      </div>
+      <form id="productForm">
+        <input type="hidden" id="originalSlug">
+        <div class="grid">
+          <div class="full"><label>Název</label><input id="name" required></div>
+          <div><label>Cena</label><input id="price" placeholder="69 000 Kč" required></div>
+          <div><label>Kategorie</label><select id="category"><option value="prepravniky">Přívěsy na koně</option><option value="nakladni-privesy">Nákladní přívěsy</option><option value="ostatni">Ostatní</option></select></div>
+          <div><label>Výrobce</label><input id="manufacturer"></div>
+          <div><label>Rok výroby</label><input id="year" type="number" min="1900" max="2100"></div>
+          <div><label>Provozní hmotnost (kg)</label><input id="weight" type="number"></div>
+          <div><label>Celková hmotnost (kg)</label><input id="totalWeight" type="number"></div>
+          <div><label>Užitečná hmotnost / nosnost (kg)</label><input id="payload" type="number"></div>
+          <div><label>STK</label><input id="stk" placeholder="08/2028"></div>
+          <div class="full"><label>Popis</label><textarea id="description" placeholder="Popis přívěsu..."></textarea></div>
+          <div class="full"><label>Hlavní fotografie</label><input id="mainImage" type="file" accept="image/*"><div id="mainPreview"></div></div>
+          <div class="full"><label>Další fotografie do galerie</label><input id="gallery" type="file" accept="image/*" multiple><div id="galleryPreview" class="thumbs"></div></div>
+        </div>
+        <div class="row" style="margin-top:18px"><button class="primary" type="submit">Uložit přívěs</button><button class="secondary" type="button" id="cancelBtn">Zrušit</button></div>
+        <div id="saveStatus" class="status"></div>
+      </form>
+    </div>
+
+    <div class="panel"><h2>Existující přívěsy</h2><div id="products"></div></div>
+  </section>
+</main>
+<script src="admin.js"></script>
+</body>
 </html>

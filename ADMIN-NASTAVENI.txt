@@ -1,0 +1,19 @@
+NOVÁ ADMINISTRACE – PŘÍVĚSY Z NIZOZEMSKA
+
+1) V GitHubu vytvoř Personal Access Token (fine-grained) pro repo czepepe-dev/privesy.
+   Potřebuje oprávnění Contents: Read and write.
+
+2) V Cloudflare Pages otevři projekt privesy:
+   Settings -> Variables and Secrets -> Functions.
+   Přidej jako ENCRYPTED/SECRET:
+     GITHUB_TOKEN = tvůj GitHub token
+     ADMIN_PASSWORD = nové heslo do administrace
+
+3) Po deployi otevři:
+   https://privesy.pages.dev/admin/
+
+DŮLEŽITÉ:
+- Heslo není uložené v JavaScriptu.
+- GitHub token není posílán do prohlížeče.
+- Nový produkt dostane automaticky datumPridani na serveru.
+- Hlavní výpis i kategorie řadí podle datumPridani sestupně (nejnovější první).
