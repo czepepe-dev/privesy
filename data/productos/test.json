@@ -1,0 +1,22 @@
+{
+  "nombre": "Test",
+  "precio": "87",
+  "categoria": "prepravniky",
+  "vyrobce": "Dres",
+  "rokVyroby": 2008,
+  "provozniHmotnostKg": 2587,
+  "celkovaHmotnostKg": 255,
+  "uzitecnaHmotnostKg": 5555,
+  "stk": "",
+  "descripcion": "Popus",
+  "imagen": "/img/galeria/test/1000184804-1788124265317.webp",
+  "galeria": [
+    {
+      "imagen": "/img/galeria/test/1000184648-1788124268168.jpg"
+    },
+    {
+      "imagen": "/img/galeria/test/1000184655-1788124276526.jpg"
+    }
+  ],
+  "datumPridani": "2026-08-30T21:11:24.679Z"
+}

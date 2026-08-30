@@ -1,0 +1,31 @@
+{
+  "nombre": "Test2",
+  "precio": "54000",
+  "categoria": "prepravniky",
+  "vyrobce": "Hitra",
+  "rokVyroby": 2006,
+  "provozniHmotnostKg": 1258,
+  "celkovaHmotnostKg": 258,
+  "uzitecnaHmotnostKg": 256,
+  "stk": "8/57",
+  "descripcion": "Popis privesu",
+  "imagen": "/img/galeria/test2/1000184826-1788124527919.jpg",
+  "galeria": [
+    {
+      "imagen": "/img/galeria/test2/1000184664-1788124530413.webp"
+    },
+    {
+      "imagen": "/img/galeria/test2/1000184694-1788124533505.jpg"
+    },
+    {
+      "imagen": "/img/galeria/test2/1000184660-1788124536160.jpg"
+    },
+    {
+      "imagen": "/img/galeria/test2/1000184647-1788124538544.jpg"
+    },
+    {
+      "imagen": "/img/galeria/test2/1000184648-1788124548666.jpg"
+    }
+  ],
+  "datumPridani": "2026-08-30T21:15:58.103Z"
+}
