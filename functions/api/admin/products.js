@@ -1,4 +1,5 @@
 import {auth,json,gh,b64decode,b64encode,BRANCH} from "./_shared.js";
+const ALLOWED = new Set(["prepravniky","nakladni-privesy","ostatni"]);
 
 export async function onRequestGet({request,env}){
   const a=await auth(request,env); if(a)return a;

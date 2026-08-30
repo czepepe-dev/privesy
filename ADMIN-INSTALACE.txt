@@ -1,0 +1,17 @@
+INSTALACE NOVÉ ADMINISTRACE
+
+1. Zkopíruj obsah tohoto balíku do kořenové složky projektu privesy.
+2. Složky admin/ a functions/ ponech ve stejné úrovni jako index.html.
+3. Nahraď loader.js.
+4. Nahraď HTML soubory z balíku.
+5. Commit to main -> Push origin.
+6. V Cloudflare už musí existovat Secrets GITHUB_TOKEN a ADMIN_PASSWORD.
+
+ŘAZENÍ PRODUKTŮ:
+- Každý nový produkt dostane datumPridani s přesným časem.
+- Index i kategorie řadí sestupně podle datumPridani.
+- Při shodném čase je použit stabilní druhý klíč slug.
+- Admin zobrazuje produkty také od nejnovějšího.
+
+ADMIN:
+https://privesy.pages.dev/admin/
