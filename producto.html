@@ -12,111 +12,35 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
-    .product-page { max-width: 1100px; margin: 40px auto; padding: 20px; text-align: center; }
-    .product-container {
-      display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: flex-start;
-    }
-    .left-col { max-width: 450px; width: 100%; }
-    .product-image {
-      width: 100%;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .product-image img {
-      width: 100%;
-      display: block;
-      cursor: zoom-in;
-    }
-    .product-gallery {
-      margin-top: 15px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      justify-items: center;
-    }
-    .product-gallery img {
-      width: 100%;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .product-info {
-      flex: 1;
-      min-width: 300px;
-      max-width: 500px;
-      text-align: left;
-    }
-    .product-price {
-      font-size: 26px;
-      font-weight: bold;
-      margin: 15px 0;
-    }
-    .product-description {
-      margin-bottom: 30px;
-      line-height: 1.6;
-    }
-    .produkt-buttons {
-      display: flex;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .produkt-btn, .produkt-info-btn {
-      flex: 1;
-      font-size: 18px;
-      border: none;
-      cursor: pointer;
-      border-radius: 6px;
-    }
-    .categorias {
-      margin-top: 60px;
-      border-top: 1px solid #eee;
-      padding-top: 30px;
-      text-align: center;
-    }
-    .categorias .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      justify-content: center;
-    }
-    #lightbox {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.92);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      cursor: zoom-out;
-      opacity: 0;
-      transition: opacity 0.25s;
-    }
-    #lightbox.show { display: flex; opacity: 1; }
-    #lightbox img {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 5px;
-    }
-    .close-lightbox {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      color: white;
-      font-size: 50px;
-      cursor: pointer;
-      user-select: none;
-    }
-    @media (max-width: 768px) {
-      .product-info { text-align: center; }
-      .produkt-buttons { flex-direction: column; }
+    .product-page { max-width:1100px; margin:40px auto; padding:20px; text-align:center; }
+    .product-container { display:flex; gap:40px; flex-wrap:wrap; justify-content:center; align-items:flex-start; }
+    .left-col { max-width:450px; width:100%; }
+    .product-image { width:100%; border-radius:10px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,.1); }
+    .product-image img { width:100%; display:block; cursor:zoom-in; }
+    .product-gallery { margin-top:15px; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; justify-items:center; }
+    .product-gallery img { width:100%; height:80px; object-fit:cover; border-radius:5px; cursor:pointer; transition:.2s; }
+    .product-info { flex:1; min-width:300px; max-width:560px; text-align:left; }
+    .product-price { font-size:26px; font-weight:bold; margin:15px 0; }
+    .product-description { margin:0 0 25px; line-height:1.6; white-space:normal; }
+    .product-description p:first-child { margin-top:0; }
+    .product-specs { margin:20px 0 25px; border-top:1px solid #eee; border-bottom:1px solid #eee; }
+    .spec-row { display:flex; justify-content:space-between; gap:20px; padding:10px 0; border-bottom:1px solid #eee; }
+    .spec-row:last-child { border-bottom:0; }
+    .spec-label { font-weight:700; }
+    .spec-value { text-align:right; }
+    .produkt-buttons { display:flex; gap:15px; margin-top:20px; }
+    .produkt-btn, .produkt-info-btn { flex:1; font-size:18px; border:none; cursor:pointer; border-radius:6px; }
+    .categorias { margin-top:60px; border-top:1px solid #eee; padding-top:30px; text-align:center; }
+    .categorias .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; justify-content:center; }
+    #lightbox { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.92); display:none; justify-content:center; align-items:center; z-index:10000; cursor:zoom-out; opacity:0; transition:opacity .25s; }
+    #lightbox.show { display:flex; opacity:1; }
+    #lightbox img { max-width:90%; max-height:90%; border-radius:5px; }
+    .close-lightbox { position:absolute; top:20px; right:30px; color:white; font-size:50px; cursor:pointer; user-select:none; }
+    @media(max-width:768px) {
+      .product-info { text-align:center; }
+      .produkt-buttons { flex-direction:column; }
+      .spec-row { text-align:left; }
+      .spec-value { text-align:right; }
     }
   </style>
 </head>
@@ -146,12 +70,17 @@
       </div>
 
       <div class="product-info">
-        <h1 id="p-nazev" class="produkt-nazev" style="font-size: 28px; margin:0;">Načítám...</h1>
+        <h1 id="p-nazev" class="produkt-nazev" style="font-size:28px;margin:0;">Načítám...</h1>
         <div class="product-price" id="p-cena"></div>
+
+        <div id="p-specs" class="product-specs"></div>
+
+        <h2 id="popis-heading" style="margin-bottom:10px;">Popis</h2>
         <div id="p-popis" class="product-description"></div>
+
         <div class="produkt-buttons">
-          <button class="produkt-btn" style="height: 50px;" onclick="window.location.href='contacto.html'">KONTAKT</button>
-          <button class="produkt-info-btn" style="height: 50px;" onclick="history.back()">ZPĚT</button>
+          <button class="produkt-btn" style="height:50px;" onclick="window.location.href='contacto.html'">KONTAKT</button>
+          <button class="produkt-info-btn" style="height:50px;" onclick="history.back()">ZPĚT</button>
         </div>
       </div>
     </div>
@@ -167,7 +96,6 @@
       </div>
     </section>
   </main>
-<footer><p>© 2026 Přívěsy z Nizozemska | Import | Prodej | Výkup | <a href="/admin/">Administrace</a></p></footer>
 
   <div id="lightbox" onclick="closeLightbox()">
     <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
@@ -191,30 +119,79 @@
       setTimeout(() => lb.style.display = "none", 250);
     }
 
+    function addSpec(label, value) {
+      if (value === null || value === undefined || String(value).trim() === "") return;
+      const row = document.createElement("div");
+      row.className = "spec-row";
+      row.innerHTML = `<span class="spec-label"></span><span class="spec-value"></span>`;
+      row.querySelector(".spec-label").textContent = label;
+      row.querySelector(".spec-value").textContent = value;
+      document.getElementById("p-specs").appendChild(row);
+    }
+
+    function formatKg(value) {
+      if (value === null || value === undefined || value === "") return "";
+      const n = Number(value);
+      return Number.isFinite(n) ? `${n.toLocaleString("cs-CZ")} kg` : `${value} kg`;
+    }
+
     async function nactiDetail() {
       if (!slug) return;
       try {
         const resp = await fetch(`/data/productos/${slug}.json?t=${Date.now()}`);
+        if (!resp.ok) throw new Error("Produkt nebyl nalezen.");
         const data = await resp.json();
 
-        document.getElementById("p-img").src = data.imagen;
-        document.getElementById("p-nazev").textContent = data.nombre;
-        document.getElementById("p-cena").textContent = data.precio;
-        document.getElementById("p-popis").innerHTML = marked.parse(data.descripcion || "");
+        document.getElementById("p-img").src = data.imagen || "";
+        document.getElementById("p-img").alt = data.nombre || "";
+        document.getElementById("p-nazev").textContent = data.nombre || "";
+        document.getElementById("p-cena").textContent = data.precio || "";
+
+        const specs = document.getElementById("p-specs");
+        specs.innerHTML = "";
+
+        addSpec("Kategorie", data.categoria === "prepravniky" ? "Přívěsy na koně" :
+          data.categoria === "nakladni-privesy" ? "Nákladní přívěsy" : "Ostatní");
+        addSpec("Výrobce", data.vyrobce);
+        addSpec("Rok výroby", data.rokVyroby);
+        addSpec("Provozní hmotnost", formatKg(data.provozniHmotnostKg));
+        addSpec("Celková hmotnost", formatKg(data.celkovaHmotnostKg));
+        addSpec("Užitečná hmotnost / nosnost", formatKg(data.uzitecnaHmotnostKg));
+        addSpec("STK", data.stk);
+
+        const popis = document.getElementById("p-popis");
+        const description = String(data.descripcion || "").trim();
+        if (description) {
+          try {
+            popis.innerHTML = (window.marked && typeof marked.parse === "function")
+              ? marked.parse(description)
+              : description.replace(/\n/g, "<br>");
+        } catch {
+          popis.textContent = description;
+        }
+        } else {
+          popis.innerHTML = "<span style='color:#777;'>Popis není uveden.</span>";
+        }
 
         const gal = document.getElementById("galerie");
-        if (data.galeria) {
+        gal.innerHTML = "";
+        if (Array.isArray(data.galeria)) {
           data.galeria.forEach(item => {
+            if (!item || !item.imagen) return;
             const img = document.createElement("img");
             img.src = item.imagen;
-            img.onclick = (e) => {
+            img.alt = data.nombre || "";
+            img.onclick = e => {
               e.stopPropagation();
               openLightbox(item.imagen);
             };
             gal.appendChild(img);
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        document.getElementById("p-nazev").textContent = "Přívěs se nepodařilo načíst.";
+        document.getElementById("p-popis").textContent = e.message || "";
+      }
     }
 
     document.addEventListener("DOMContentLoaded", nactiDetail);

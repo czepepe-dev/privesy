@@ -9,60 +9,77 @@ async function ziskejSeznamSouboru() {
     const resp = await fetch(url);
     if (!resp.ok) return [];
     const files = await resp.json();
-    return files.filter(f => f.type === 'file' && f.name.endsWith('.json')).map(f => f.name);
-  } catch (e) { return []; }
+    return files
+      .filter(f => f.type === "file" && f.name.toLowerCase().endsWith(".json"))
+      .map(f => f.name);
+  } catch (e) {
+    return [];
+  }
 }
 
 async function nactiVsechnyProdukty() {
   const seznam = await ziskejSeznamSouboru();
   const produkty = [];
+
   for (const file of seznam) {
     try {
       const resp = await fetch(`/${PRODUCT_PATH}/${file}?t=${Date.now()}`);
       const data = await resp.json();
-      const kat = String(data.categoria || '').toLowerCase().trim();
+      const kat = String(data.categoria || "").toLowerCase().trim();
       if (!POVOLENE_KATEGORIE.has(kat)) continue;
-      data.slug = file.replace(/\.json$/i, '');
+      data.slug = file.replace(/\.json$/i, "");
       produkty.push(data);
     } catch (e) {}
   }
+
+  // NEJDŮLEŽITĚJŠÍ: vždy nejnovější produkt jako první.
+  // datumPridani obsahuje datum + přesný čas.
   produkty.sort((a, b) => {
-    const da = Date.parse(a.datumPridani || '') || 0;
-    const db = Date.parse(b.datumPridani || '') || 0;
-    if (db !== da) return db - da;
-    return String(b.slug || '').localeCompare(String(a.slug || ''));
+    const ta = Date.parse(a.datumPridani || "") || 0;
+    const tb = Date.parse(b.datumPridani || "") || 0;
+    if (tb !== ta) return tb - ta;
+    return String(b.slug || "").localeCompare(String(a.slug || ""));
   });
+
   return produkty;
 }
 
 async function nactiProdukty(kategorie) {
-  const cont = document.getElementById('produkty');
-  if (cont) cont.innerHTML = '<p>Načítám přívěsy...</p>';
-  const produkty = (await nactiVsechnyProdukty()).filter(p => String(p.categoria).toLowerCase() === String(kategorie).toLowerCase());
-  vykresliKarty(produkty, 'produkty');
+  const cont = document.getElementById("produkty");
+  if (cont) cont.innerHTML = "<p>Načítám přívěsy...</p>";
+  const produkty = (await nactiVsechnyProdukty())
+    .filter(p => String(p.categoria).toLowerCase() === String(kategorie).toLowerCase());
+  vykresliKarty(produkty, "produkty");
 }
 
 async function nactiNoveProdukty() {
-  const cont = document.getElementById('nove-produkty');
+  const cont = document.getElementById("nove-produkty");
   if (!cont) return;
   const produkty = await nactiVsechnyProdukty();
   const limit = window.innerWidth < 768 ? 3 : 10;
-  vykresliKarty(produkty.slice(0, limit), 'nove-produkty');
+  vykresliKarty(produkty.slice(0, limit), "nove-produkty");
 }
 
 function vykresliKarty(produkty, containerId) {
   const cont = document.getElementById(containerId);
   if (!cont) return;
-  cont.innerHTML = produkty.length === 0 ? '<p>Momentálně nejsou v této kategorii žádné přívěsy.</p>' : '';
+
+  cont.innerHTML = produkty.length === 0
+    ? "<p>Momentálně nejsou v této kategorii žádné přívěsy.</p>"
+    : "";
+
   produkty.forEach(p => {
     const detailUrl = `/producto.html?slug=${encodeURIComponent(p.slug)}`;
-    const cistyText = String(p.descripcion || '').replace(/<[^>]*>?/gm, '').replace(/[#*`_]/g, '');
+    const cistyText = String(p.descripcion || "")
+      .replace(/<[^>]*>?/gm, "")
+      .replace(/[#*`_]/g, "");
     const shortText = cistyText.substring(0, 110);
+
     cont.innerHTML += `<div class="produkt-card">
       <img src="${p.imagen}" alt="${p.nombre}" class="produkt-img" onclick="window.location.href='${detailUrl}'">
       <h2 class="produkt-nazev">${p.nombre}</h2>
       <h1 class="produkt-cena">${p.precio}</h1>
-      <div class="produkt-popis">${shortText}${cistyText.length > 110 ? '...' : ''}</div>
+      <div class="produkt-popis">${shortText}${cistyText.length > 110 ? "..." : ""}</div>
       <div class="produkt-buttons">
         <button class="produkt-btn" onclick="window.location.href='${detailUrl}'">DETAIL</button>
         <button class="produkt-info-btn" onclick="window.location.href='contacto.html'">KONTAKT</button>
@@ -72,7 +89,7 @@ function vykresliKarty(produkty, containerId) {
 }
 
 function scrollSlider(direction) {
-  const slider = document.getElementById('nove-produkty');
+  const slider = document.getElementById("nove-produkty");
   if (!slider) return;
-  slider.scrollBy({ left: direction * slider.clientWidth, behavior: 'smooth' });
+  slider.scrollBy({ left: direction * slider.clientWidth, behavior: "smooth" });
 }

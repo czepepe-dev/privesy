@@ -15,29 +15,66 @@ function slugify(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").to
 function setStatus(el,msg,ok=false){ el.textContent=msg; el.style.color=ok?"#176b3a":"#b42318"; }
 
 $("loginForm").addEventListener("submit", async e=>{
-  e.preventDefault(); setStatus($("loginStatus"),"Přihlašuji...",true);
-  try { await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("password").value})}); $("password").value=""; showApp(); }
-  catch(err){ setStatus($("loginStatus"),err.message); }
+  e.preventDefault();
+  setStatus($("loginStatus"),"Přihlašuji...",true);
+  try {
+    await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("password").value})});
+    $("password").value="";
+    showApp();
+  } catch(err){ setStatus($("loginStatus"),err.message); }
 });
+
 $("logoutBtn").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});showLogin();};
 $("newBtn").onclick=resetForm;
 $("cancelBtn").onclick=resetForm;
 
 function resetForm(){
-  currentProduct=null; $("productForm").reset(); $("originalSlug").value="";
-  $("formTitle").textContent="Nový přívěs"; $("mainPreview").innerHTML=""; $("galleryPreview").innerHTML=""; $("saveStatus").textContent="";
+  currentProduct=null;
+  $("productForm").reset();
+  $("originalSlug").value="";
+  $("formTitle").textContent="Nový přívěs";
+  $("mainPreview").innerHTML="";
+  $("galleryPreview").innerHTML="";
+  $("saveStatus").textContent="";
+  updatePayload();
 }
+
 function fillForm(p){
-  currentProduct=p; $("originalSlug").value=p.slug||""; $("formTitle").textContent="Upravit přívěs";
-  $("name").value=p.nombre||""; $("price").value=p.precio||""; $("category").value=p.categoria||"ostatni";
-  $("manufacturer").value=p.vyrobce||""; $("year").value=p.rokVyroby||"";
-  $("weight").value=p.provozniHmotnostKg||""; $("totalWeight").value=p.celkovaHmotnostKg||""; $("payload").value=p.uzitecnaHmotnostKg||"";
-  $("stk").value=p.stk||""; $("description").value=p.descripcion||"";
-  $("mainImage").value=""; $("gallery").value="";
+  currentProduct=p;
+  $("originalSlug").value=p.slug||"";
+  $("formTitle").textContent="Upravit přívěs";
+  $("name").value=p.nombre||"";
+  $("price").value=p.precio||"";
+  $("category").value=p.categoria||"ostatni";
+  $("manufacturer").value=p.vyrobce||"";
+  $("year").value=p.rokVyroby||"";
+  $("weight").value=p.provozniHmotnostKg??"";
+  $("totalWeight").value=p.celkovaHmotnostKg??"";
+  updatePayload();
+  $("stk").value=p.stk||"";
+  $("description").value=p.descripcion||"";
+  $("mainImage").value="";
+  $("gallery").value="";
   $("mainPreview").innerHTML=p.imagen?`<img class="thumb" src="${p.imagen}">`:"";
   $("galleryPreview").innerHTML=(p.galeria||[]).map(x=>`<img class="thumb" src="${x.imagen}">`).join("");
   window.scrollTo({top:0,behavior:"smooth"});
 }
+
+function updatePayload(){
+  const total = Number($("totalWeight").value);
+  const operating = Number($("weight").value);
+  if (Number.isFinite(total) && Number.isFinite(operating) &&
+      $("totalWeight").value !== "" && $("weight").value !== "") {
+    const payload = total - operating;
+    $("payload").value = payload >= 0 ? payload : "";
+  } else {
+    $("payload").value = "";
+  }
+}
+
+$("weight").addEventListener("input", updatePayload);
+$("totalWeight").addEventListener("input", updatePayload);
+
 async function loadProducts(){
   try{
     const data=await api("/api/admin/products");
@@ -67,33 +104,53 @@ async function uploadImage(file, slug){
   const safe=(file.name.replace(/\.[^.]+$/,"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"foto");
   return api("/api/admin/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug,filename:`${safe}-${Date.now()}.${ext}`,content})});
 }
+
 $("productForm").addEventListener("submit",async e=>{
-  e.preventDefault(); setStatus($("saveStatus"),"Ukládám...",true);
+  e.preventDefault();
+  updatePayload();
+  setStatus($("saveStatus"),"Ukládám...",true);
   try{
     const name=$("name").value.trim(), slug=slugify(name);
     if(!slug)throw new Error("Zadej název přívěsu.");
     const old=currentProduct;
     const mainFile=$("mainImage").files[0];
     const galleryFiles=[...$("gallery").files];
+
+    const total = $("totalWeight").value==="" ? null : Number($("totalWeight").value);
+    const operating = $("weight").value==="" ? null : Number($("weight").value);
+    const payload = (total !== null && operating !== null && Number.isFinite(total) && Number.isFinite(operating))
+      ? total - operating
+      : null;
+
     const product={
-      nombre:name, precio:$("price").value.trim(), categoria:$("category").value,
-      vyrobce:$("manufacturer").value.trim(), rokVyroby:$("year").value?Number($("year").value):null,
-      provozniHmotnostKg:$("weight").value?Number($("weight").value):null,
-      celkovaHmotnostKg:$("totalWeight").value?Number($("totalWeight").value):null,
-      uzitecnaHmotnostKg:$("payload").value?Number($("payload").value):null,
-      stk:$("stk").value.trim(), descripcion:$("description").value
+      nombre:name,
+      precio:$("price").value.trim(),
+      categoria:$("category").value,
+      vyrobce:$("manufacturer").value.trim(),
+      rokVyroby:$("year").value?Number($("year").value):null,
+      provozniHmotnostKg:operating,
+      celkovaHmotnostKg:total,
+      uzitecnaHmotnostKg:payload,
+      stk:$("stk").value.trim(),
+      descripcion:$("description").value
     };
+
     if(old?.datumPridani) product.datumPridani=old.datumPridani;
     if(old?.imagen) product.imagen=old.imagen;
     if(old?.galeria) product.galeria=old.galeria;
+
     if(!product.imagen && !mainFile) throw new Error("Vyber hlavní fotografii.");
     if(mainFile){ const r=await uploadImage(mainFile,slug); product.imagen=r.url; }
     if(galleryFiles.length){
       product.galeria=product.galeria||[];
       for(const f of galleryFiles){ const r=await uploadImage(f,slug); product.galeria.push({imagen:r.url}); }
     }
+
     const r=await api("/api/admin/products",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug,originalSlug:old?.slug||"",product})});
-    setStatus($("saveStatus"),r.message,true); resetForm(); loadProducts();
+    setStatus($("saveStatus"),r.message,true);
+    resetForm();
+    loadProducts();
   }catch(err){setStatus($("saveStatus"),err.message);}
 });
+
 (async()=>{try{await api("/api/admin/me");showApp();}catch{showLogin();}})();
