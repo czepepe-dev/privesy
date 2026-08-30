@@ -1,5 +1,5 @@
 const REPO_OWNER = "czepepe-dev";
-const REPO_NAME = "solarcity";
+const REPO_NAME = "privesy";
 const PRODUCT_PATH = "data/productos";
 
 async function ziskejSeznamSouboru() {
