@@ -449,3 +449,172 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
     margin-top: 5px !important;
   }
 }
+
+
+/* ============================================
+   AKTUALIZACE – LOGO, GALERIE A LIGHTBOX
+============================================ */
+.logo { flex: 0 1 auto; min-width: 0; }
+.logo a { display:block; line-height:0; }
+.logo img {
+  display:block;
+  height:90px !important;
+  width:auto;
+  max-width:100%;
+  object-fit:contain;
+}
+
+/* Hlavní fotografie má stín přesně podle skutečného rozměru obrázku. */
+.product-page .left-col { width:100%; max-width:450px; }
+.product-page .product-image {
+  width:100%;
+  max-width:100%;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:none;
+  line-height:0;
+  background:transparent;
+}
+.product-page .product-image img {
+  width:100%;
+  max-width:100%;
+  height:auto;
+  display:block;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,.16);
+}
+.product-page .product-gallery {
+  width:100%;
+  max-width:100%;
+  margin:15px 0 0;
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:10px;
+  align-items:start;
+}
+.product-page .product-gallery img {
+  width:100%;
+  height:82px;
+  display:block;
+  object-fit:cover;
+  border-radius:7px;
+  cursor:pointer;
+  box-sizing:border-box;
+  border:2px solid transparent;
+  box-shadow:0 2px 7px rgba(0,0,0,.10);
+}
+.product-page .product-gallery img.active { border-color:#1877F2; }
+
+/* Lightbox s ovládáním a posuvným pásem miniatur dole. */
+#lightbox {
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.94);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:10000;
+  opacity:0;
+  transition:opacity .25s;
+  cursor:default;
+}
+#lightbox.show { display:flex; opacity:1; }
+#lightbox .lightbox-stage {
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:70px 80px 125px;
+  box-sizing:border-box;
+}
+#lightbox-img {
+  max-width:100%;
+  max-height:100%;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  border-radius:5px;
+  cursor:default;
+  user-select:none;
+}
+.close-lightbox {
+  position:absolute;
+  top:12px;
+  right:22px;
+  color:white;
+  font-size:48px;
+  line-height:1;
+  cursor:pointer;
+  user-select:none;
+  z-index:3;
+}
+.lightbox-nav {
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:48px;
+  height:48px;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.92);
+  color:#1877F2;
+  font-size:28px;
+  font-weight:700;
+  cursor:pointer;
+  z-index:3;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+.lightbox-prev { left:18px; }
+.lightbox-next { right:18px; }
+.lightbox-strip {
+  position:absolute;
+  left:70px;
+  right:70px;
+  bottom:18px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:5px 4px 10px;
+  box-sizing:border-box;
+  scrollbar-width:auto;
+}
+.lightbox-strip::-webkit-scrollbar { height:9px; }
+.lightbox-strip::-webkit-scrollbar-thumb { background:rgba(255,255,255,.65); border-radius:8px; }
+.lightbox-thumb {
+  flex:0 0 78px;
+  width:78px;
+  height:58px;
+  object-fit:cover;
+  border-radius:5px;
+  border:2px solid transparent;
+  opacity:.7;
+  cursor:pointer;
+  box-sizing:border-box;
+}
+.lightbox-thumb.active { border-color:#fff; opacity:1; }
+
+@media (max-width:768px) {
+  .topbar { padding:8px 10px !important; }
+  .logo { width:100%; display:flex; justify-content:center; }
+  .logo img {
+    width:100% !important;
+    height:auto !important;
+    max-width:100%;
+    max-height:95px;
+    object-fit:contain;
+  }
+  body { padding-top:115px; }
+  .product-page .left-col { max-width:100%; }
+  .product-page .product-gallery { gap:7px; }
+  .product-page .product-gallery img { height:auto; aspect-ratio:1.35/1; }
+  #lightbox .lightbox-stage { padding:55px 12px 120px; }
+  .lightbox-nav { width:42px; height:42px; font-size:24px; }
+  .lightbox-prev { left:8px; }
+  .lightbox-next { right:8px; }
+  .lightbox-strip { left:10px; right:10px; bottom:10px; }
+  .lightbox-thumb { flex-basis:70px; width:70px; height:52px; }
+}
