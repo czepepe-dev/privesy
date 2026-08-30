@@ -2,7 +2,6 @@ const REPO_OWNER = "czepepe-dev";
 const REPO_NAME = "privesy";
 const PRODUCT_PATH = "data/productos";
 const POVOLENE_KATEGORIE = new Set(["prepravniky", "nakladni-privesy", "ostatni"]);
-
 async function ziskejSeznamSouboru() {
   try {
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${PRODUCT_PATH}?ref=main&t=${Date.now()}`;
@@ -12,7 +11,6 @@ async function ziskejSeznamSouboru() {
     return files.filter(f => f.type === 'file' && f.name.endsWith('.json')).map(f => f.name);
   } catch (e) { return []; }
 }
-
 async function nactiVsechnyProdukty() {
   const seznam = await ziskejSeznamSouboru();
   const produkty = [];
@@ -28,14 +26,12 @@ async function nactiVsechnyProdukty() {
   }
   return produkty;
 }
-
 async function nactiProdukty(kategorie) {
   const cont = document.getElementById('produkty');
   if (cont) cont.innerHTML = '<p>Načítám přívěsy...</p>';
   const produkty = (await nactiVsechnyProdukty()).filter(p => String(p.categoria).toLowerCase() === String(kategorie).toLowerCase());
   vykresliKarty(produkty, 'produkty');
 }
-
 async function nactiNoveProdukty() {
   const cont = document.getElementById('nove-produkty');
   if (!cont) return;
@@ -43,7 +39,6 @@ async function nactiNoveProdukty() {
   const limit = window.innerWidth < 768 ? 3 : 10;
   vykresliKarty(produkty.slice(0, limit), 'nove-produkty');
 }
-
 function vykresliKarty(produkty, containerId) {
   const cont = document.getElementById(containerId);
   if (!cont) return;
@@ -58,13 +53,12 @@ function vykresliKarty(produkty, containerId) {
       <h1 class="produkt-cena">${p.precio}</h1>
       <div class="produkt-popis">${shortText}${cistyText.length > 110 ? '...' : ''}</div>
       <div class="produkt-buttons">
-        <button class="produkt-btn" onclick="window.location.href='contacto.html'">KONTAKT</button>
         <button class="produkt-info-btn" onclick="window.location.href='${detailUrl}'">DETAIL</button>
+        <button class="produkt-btn" onclick="window.location.href='contacto.html'">KONTAKT</button>
       </div>
     </div>`;
   });
 }
-
 function scrollSlider(direction) {
   const slider = document.getElementById('nove-produkty');
   if (!slider) return;

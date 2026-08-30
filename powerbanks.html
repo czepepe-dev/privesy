@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Powerbanks Solares - Tecnología solar</title>
+
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link id="theme-style" rel="stylesheet" href="assets/css/style-day.css">
+</head>
+
+<body>
+
+  <!-- TOP BAR / MENU -->
+  <header class="topbar">
+    <div class="logo">
+      <a href="index.html">
+        <img src="logo.png" alt="SolarCity logo" style="height:90px;">
+      </a>
+    </div>
+
+    <nav class="menu">
+      <a href="powerbanks.html">Powerbanks</a>
+      <a href="paneles.html">Paneles</a>
+      <a href="luces.html">Otros</a>
+      <a href="contacto.html">Contacto</a>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION -->
+  <main class="hero">
+
+    <section class="intro">
+      <h1>Powerbanks Solares</h1>
+    </section>
+
+    <section>
+      <div id="produkty" class="produkty-grid"></div>
+    </section>
+
+    <!-- CATEGORY GRID -->
+    <section class="categorias">
+      <h2>Categorías</h2>
+      <p>Aquí encontrarás más productos...</p>
+      <div class="grid">
+        <a class="card" href="powerbanks.html">Powerbanks</a>
+        <a class="card" href="paneles.html">Paneles</a>
+        <a class="card" href="luces.html">Otros</a>
+        <a class="card" href="contacto.html">Contacto</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      <a href="https://solarcitycuba.netlify.app/admin/">Admin</a> © 2026 Tecnología solar
+    </p>
+  </footer>
+
+  <script src="loader.js"></script>
+  <script>
+    nactiProdukty("powerbanks");
+  </script>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
