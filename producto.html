@@ -80,10 +80,10 @@
         <img src="logo.png" alt="Přívěsy z Nizozemska" style="height:90px;">
       </a>
     </div>
-    <nav class="menu">
+    <button class="mobile-menu-toggle" type="button" aria-label="Otevřít menu" onclick="this.parentElement.classList.toggle('menu-open')"><span></span><span></span><span></span></button><nav class="menu">
       <a href="privesy-na-kone.html">Přívěsy na koně</a>
       <a href="nakladni-privesy.html">Nákladní přívěsy</a>
-      <a href="ostatni.html">Ostatní</a>
+      <a href="ostatni.html">Prodané přívěsy</a>
       <a href="contacto.html">Kontakt</a>
     </nav>
   </header>
@@ -119,7 +119,7 @@
       <div class="grid">
         <a class="card" href="privesy-na-kone.html">Přívěsy na koně</a>
         <a class="card" href="nakladni-privesy.html">Nákladní přívěsy</a>
-        <a class="card" href="ostatni.html">Ostatní</a>
+        <a class="card" href="ostatni.html">Prodané přívěsy</a>
         <a class="card" href="contacto.html">Kontakt</a>
       </div>
     </section>
@@ -249,7 +249,7 @@
         specs.innerHTML = "";
 
         addSpec("Kategorie", data.categoria === "prepravniky" ? "Přívěsy na koně" :
-          data.categoria === "nakladni-privesy" ? "Nákladní přívěsy" : "Ostatní");
+          data.categoria === "nakladni-privesy" ? "Nákladní přívěsy" : "Prodané přívěsy");
         addSpec("Výrobce", data.vyrobce);
         addSpec("Rok výroby", data.rokVyroby);
         addSpec("Provozní hmotnost", formatKg(data.provozniHmotnostKg));

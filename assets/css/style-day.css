@@ -412,6 +412,62 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   margin: 15px auto !important;
 }
 
+
+/* ============================================
+   MOBILNÍ MENU + VELKÉ LOGO
+============================================ */
+.mobile-menu-toggle {
+  display: none;
+  border: 0;
+  background: transparent;
+  font-size: 34px;
+  line-height: 1;
+  padding: 2px 8px;
+  cursor: pointer;
+  color: #1a1a1a;
+}
+.mobile-menu-toggle span {
+  display: block;
+  width: 28px;
+  height: 3px;
+  margin: 5px 0;
+  background: currentColor;
+  border-radius: 2px;
+}
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+    padding: 2px 2px 8px !important;
+  }
+  .logo { width: 100% !important; display: flex !important; justify-content: center !important; }
+  .logo img {
+    display: block !important;
+    width: calc(100vw - 4px) !important;
+    max-width: none !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
+  }
+  .mobile-menu-toggle {
+    display: block !important;
+    align-self: center;
+    width: 52px;
+    height: 42px;
+  }
+  .topbar nav {
+    display: none !important;
+    width: 100%;
+    flex-direction: column !important;
+    gap: 2px !important;
+    align-items: stretch !important;
+  }
+  .topbar.menu-open nav { display: flex !important; }
+  .topbar nav a { text-align: center; width: 100%; box-sizing: border-box; }
+  body { padding-top: 145px !important; }
+}
+
 /* ============================================
     5. MOBILNÍ OPTIMALIZACE
 ============================================ */
