@@ -7,7 +7,7 @@ public_folder: "/img"
 
 collections:
   - name: "productos"
-    label: "Productos"
+    label: "Přívěsy"
     folder: "data/productos"
     create: true
     identifier_field: "nombre"
@@ -15,23 +15,22 @@ collections:
     format: "json"
     extension: "json"
     fields:
-      - { label: "Nombre del Producto", name: "nombre", widget: "string" }
-      - { label: "Precio", name: "precio", widget: "string" }
-      - { label: "Imagen Principal", name: "imagen", widget: "image" }
+      - { label: "Název přívěsu", name: "nombre", widget: "string" }
+      - { label: "Cena", name: "precio", widget: "string" }
+      - { label: "Hlavní obrázek", name: "imagen", widget: "image" }
       - { 
-          label: "Categoría", 
+          label: "Kategorie", 
           name: "categoria", 
           widget: "select", 
           options: [
-            { label: "Powerbanks", value: "powerbanks" },
-            { label: "Paneles Solares", value: "paneles" },
-            { label: "Luces LED", value: "luces" },
-            { label: "Sistemas Completos", value: "sistemas" }
+            { label: "Přívěsy na koně", value: "prepravniky" },
+            { label: "Nákladní přívěsy", value: "nakladni-privesy" },
+            { label: "Ostatní", value: "ostatni" }
           ] 
         }
-      - { label: "Descripción", name: "descripcion", widget: "markdown" }
+      - { label: "Popis", name: "descripcion", widget: "markdown" }
       - { 
-          label: "Galería de imágenes", 
+          label: "Galerie obrázků", 
           name: "galeria", 
           widget: "list", 
           fields: [
