@@ -1,0 +1,40 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "img"
+public_folder: "/img"
+
+collections:
+  - name: "productos"
+    label: "Productos"
+    folder: "data/productos"
+    create: true
+    identifier_field: "nombre"
+    slug: "{{nombre | slugify}}"
+    format: "json"
+    extension: "json"
+    fields:
+      - { label: "Nombre del Producto", name: "nombre", widget: "string" }
+      - { label: "Precio", name: "precio", widget: "string" }
+      - { label: "Imagen Principal", name: "imagen", widget: "image" }
+      - { 
+          label: "Categoría", 
+          name: "categoria", 
+          widget: "select", 
+          options: [
+            { label: "Powerbanks", value: "powerbanks" },
+            { label: "Paneles Solares", value: "paneles" },
+            { label: "Luces LED", value: "luces" },
+            { label: "Sistemas Completos", value: "sistemas" }
+          ] 
+        }
+      - { label: "Descripción", name: "descripcion", widget: "markdown" }
+      - { 
+          label: "Galería de imágenes", 
+          name: "galeria", 
+          widget: "list", 
+          fields: [
+            { label: "Imagen", name: "imagen", widget: "image" }
+          ] 
+        }

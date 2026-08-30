@@ -1,0 +1,6 @@
+[build]
+command = "echo building"
+publish = "."
+
+[functions]
+directory = "netlify/functions"
