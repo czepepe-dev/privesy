@@ -1,7 +1,7 @@
 {
   "nombre": "Přepravník koní se sedlovnou Westrailers Belgie",
-  "precio": "45000",
-  "categoria": "prepravniky",
+  "precio": "PRODÁNO",
+  "categoria": "ostatni",
   "vyrobce": "Westrailers (Belgie)",
   "rokVyroby": 2002,
   "provozniHmotnostKg": 680,
@@ -9,6 +9,7 @@
   "uzitecnaHmotnostKg": 1320,
   "stk": "07/2028",
   "descripcion": "Kvalitní přívěs s odvětranou sedlovnou pro 2 koně WESTTRAILERS v celkově dobrém stavu. 2 roky nová voděodolná protiskluzová podlaha (celogumový povrch), okopy, krmný žlab, 2x otevírací polohovatelné okno, samonavíjecí zadní roletka, vnitřní osvětlení, oko na krmnou síť, žárově pozinkovaný ocelový rám, pogumovaná rampa se stupačkou, zátěžové kolečko. ",
+  "datumPridani": "2026-08-31T13:09:56.838Z",
   "imagen": "/img/galeria/prepravnik-koni-se-sedlovnou-westrailers-belgie/223233902-1788181778560.jpg",
   "galeria": [
     {
@@ -38,6 +39,5 @@
     {
       "imagen": "/img/galeria/prepravnik-koni-se-sedlovnou-westrailers-belgie/223233902-1-1788181794752.jpg"
     }
-  ],
-  "datumPridani": "2026-08-31T13:09:56.838Z"
+  ]
 }
