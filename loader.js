@@ -23,7 +23,10 @@ async function nactiVsechnyProdukty() {
 
   for (const file of seznam) {
     try {
-      const resp = await fetch(`/${PRODUCT_PATH}/${file}?t=${Date.now()}`);
+      const resp = await fetch(
+        `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${PRODUCT_PATH}/${encodeURIComponent(file)}?t=${Date.now()}`
+      );
+      if (!resp.ok) throw new Error(`Nelze načíst ${file}`);
       const data = await resp.json();
       const kat = String(data.categoria || "").toLowerCase().trim();
       if (!POVOLENE_KATEGORIE.has(kat)) continue;
@@ -55,7 +58,8 @@ async function nactiProdukty(kategorie) {
 async function nactiNoveProdukty() {
   const cont = document.getElementById("nove-produkty");
   if (!cont) return;
-  const produkty = await nactiVsechnyProdukty();
+  const produkty = (await nactiVsechnyProdukty())
+    .filter(p => String(p.categoria || "").toLowerCase() !== "ostatni");
   const limit = window.innerWidth < 768 ? 3 : 10;
   vykresliKarty(produkty.slice(0, limit), "nove-produkty");
 }
