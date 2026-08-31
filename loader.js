@@ -64,6 +64,14 @@ async function nactiNoveProdukty() {
   vykresliKarty(produkty.slice(0, limit), "nove-produkty");
 }
 
+
+function zobrazCenuProduktu(p){
+  if(String(p.categoria||"").toLowerCase()==="ostatni" && String(p.precio||"").toUpperCase()==="PRODÁNO"){
+    return '<span class="cena-prodano">PRODÁNO</span>';
+  }
+  return p.precio ? p.precio : "";
+}
+
 function vykresliKarty(produkty, containerId) {
   const cont = document.getElementById(containerId);
   if (!cont) return;
@@ -82,7 +90,7 @@ function vykresliKarty(produkty, containerId) {
     cont.innerHTML += `<div class="produkt-card">
       <img src="${p.imagen}" alt="${p.nombre}" class="produkt-img" onclick="window.location.href='${detailUrl}'">
       <h2 class="produkt-nazev">${p.nombre}</h2>
-      <h1 class="produkt-cena">${p.precio}</h1>
+      <h1 class="produkt-cena">${zobrazCenuProduktu(p)}</h1>
       <div class="produkt-popis">${shortText}${cistyText.length > 110 ? "..." : ""}</div>
       <div class="produkt-buttons">
         <button class="produkt-btn" onclick="window.location.href='${detailUrl}'">DETAIL</button>

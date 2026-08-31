@@ -674,3 +674,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   .lightbox-strip { left:10px; right:10px; bottom:10px; }
   .lightbox-thumb { flex-basis:70px; width:70px; height:52px; }
 }
+
+
+/* Prodané přívěsy – stejná typografie jako cena, pouze červená */
+.cena-prodano{color:#d00;font:inherit;font-weight:inherit;}
