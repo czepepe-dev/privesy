@@ -30,7 +30,7 @@ $("cancelBtn").onclick=resetForm;
 
 function resetForm(){
   currentProduct=null;
-  $("productForm").reset(); $("manufacturerSelect").value=""; $("manufacturerCustom").value="";
+  $("productForm").reset();
   $("originalSlug").value="";
   $("formTitle").textContent="Nový přívěs";
   $("mainPreview").innerHTML="";
@@ -44,12 +44,9 @@ function fillForm(p){
   $("originalSlug").value=p.slug||"";
   $("formTitle").textContent="Upravit přívěs";
   $("name").value=p.nombre||"";
-  $("price").value=p.precio||"";
+  $("price").value=(p.categoria==="ostatni" && p.puvodniCena) ? p.puvodniCena : (p.precio||"");
   $("category").value=p.categoria||"ostatni";
-  const maker = p.vyrobce || "";
-  const makerOption = [...$("manufacturerSelect").options].find(o => o.value === maker);
-  $("manufacturerSelect").value = makerOption ? maker : "";
-  $("manufacturerCustom").value = makerOption ? "" : maker;
+  $("manufacturer").value=p.vyrobce||"";
   $("year").value=p.rokVyroby||"";
   $("weight").value=p.provozniHmotnostKg??"";
   $("totalWeight").value=p.celkovaHmotnostKg??"";
@@ -127,9 +124,14 @@ $("productForm").addEventListener("submit",async e=>{
 
     const product={
       nombre:name,
-      precio:$("price").value.trim(),
+      precio:(String($("category").value).toLowerCase()==="ostatni")
+        ? "PRODÁNO"
+        : $("price").value.trim(),
+      puvodniCena:(String($("category").value).toLowerCase()==="ostatni")
+        ? (old?.puvodniCena || (old?.precio && old.precio !== "PRODÁNO" ? old.precio : null))
+        : null,
       categoria:$("category").value,
-      vyrobce:($("manufacturerCustom").value.trim() || $("manufacturerSelect").value),
+      vyrobce:$("manufacturer").value.trim(),
       rokVyroby:$("year").value?Number($("year").value):null,
       provozniHmotnostKg:operating,
       celkovaHmotnostKg:total,
