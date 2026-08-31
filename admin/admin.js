@@ -30,7 +30,7 @@ $("cancelBtn").onclick=resetForm;
 
 function resetForm(){
   currentProduct=null;
-  $("productForm").reset();
+  $("productForm").reset(); $("manufacturerSelect").value=""; $("manufacturerCustom").value="";
   $("originalSlug").value="";
   $("formTitle").textContent="Nový přívěs";
   $("mainPreview").innerHTML="";
@@ -46,7 +46,10 @@ function fillForm(p){
   $("name").value=p.nombre||"";
   $("price").value=(p.categoria==="ostatni" && p.puvodniCena) ? p.puvodniCena : (p.precio||"");
   $("category").value=p.categoria||"ostatni";
-  $("manufacturer").value=p.vyrobce||"";
+  const maker=p.vyrobce||"";
+  const makerOption=[...$("manufacturerSelect").options].find(o=>o.value===maker);
+  $("manufacturerSelect").value=makerOption?maker:"";
+  $("manufacturerCustom").value=makerOption?"":maker;
   $("year").value=p.rokVyroby||"";
   $("weight").value=p.provozniHmotnostKg??"";
   $("totalWeight").value=p.celkovaHmotnostKg??"";
@@ -54,7 +57,7 @@ function fillForm(p){
   $("stk").value=p.stk||"";
   $("description").value=p.descripcion||"";
   $("mainImage").value="";
-  $("gallery").value="";
+  $("gallery").value=""; galleryPreviewItems=[]; renderGalleryPreview();
   $("mainPreview").innerHTML=p.imagen?`<img class="thumb" src="${p.imagen}">`:"";
   $("galleryPreview").innerHTML=(p.galeria||[]).map(x=>`<img class="thumb" src="${x.imagen}">`).join("");
   window.scrollTo({top:0,behavior:"smooth"});
@@ -114,7 +117,7 @@ $("productForm").addEventListener("submit",async e=>{
     if(!slug)throw new Error("Zadej název přívěsu.");
     const old=currentProduct;
     const mainFile=$("mainImage").files[0];
-    const galleryFiles=[...$("gallery").files];
+    const galleryFiles=[...galleryPreviewItems].map(x=>x.file);
 
     const total = $("totalWeight").value==="" ? null : Number($("totalWeight").value);
     const operating = $("weight").value==="" ? null : Number($("weight").value);
@@ -131,7 +134,7 @@ $("productForm").addEventListener("submit",async e=>{
         ? (old?.puvodniCena || (old?.precio && old.precio !== "PRODÁNO" ? old.precio : null))
         : null,
       categoria:$("category").value,
-      vyrobce:$("manufacturer").value.trim(),
+      vyrobce:($("manufacturerCustom").value.trim() || $("manufacturerSelect").value),
       rokVyroby:$("year").value?Number($("year").value):null,
       provozniHmotnostKg:operating,
       celkovaHmotnostKg:total,
@@ -159,3 +162,37 @@ $("productForm").addEventListener("submit",async e=>{
 });
 
 (async()=>{try{await api("/api/admin/me");showApp();}catch{showLogin();}})();
+
+
+// Náhled fotogalerie před uložením – přetažení mění pořadí
+let galleryPreviewItems=[];
+let galleryDragIndex=null;
+function renderGalleryPreview(){
+  const box=$("galleryPreview"); if(!box)return;
+  box.innerHTML="";
+  galleryPreviewItems.forEach((item,i)=>{
+    const el=document.createElement("div"); el.className="gallery-item"; el.draggable=true;
+    const img=document.createElement("img"); img.src=item.url; img.alt="Náhled "+(i+1);
+    const pos=document.createElement("div"); pos.className="gallery-pos"; pos.textContent="Pozice "+(i+1);
+    const rm=document.createElement("button"); rm.type="button"; rm.className="gallery-remove"; rm.textContent="×";
+    rm.onclick=e=>{e.stopPropagation();galleryPreviewItems.splice(i,1);syncGalleryInput();renderGalleryPreview();};
+    el.append(img,pos,rm);
+    el.ondragstart=()=>{galleryDragIndex=i;el.classList.add("dragging");};
+    el.ondragend=()=>{galleryDragIndex=null;el.classList.remove("dragging");};
+    el.ondragover=e=>e.preventDefault();
+    el.ondrop=e=>{e.preventDefault();if(galleryDragIndex===null||galleryDragIndex===i)return;
+      const x=galleryPreviewItems.splice(galleryDragIndex,1)[0];galleryPreviewItems.splice(i,0,x);
+      syncGalleryInput();renderGalleryPreview();};
+    box.appendChild(el);
+  });
+}
+function syncGalleryInput(){
+  const input=$("gallery"); if(!input)return;
+  const dt=new DataTransfer();
+  galleryPreviewItems.forEach(x=>{if(x.file)dt.items.add(x.file);});
+  input.files=dt.files;
+}
+$("gallery")?.addEventListener("change",e=>{
+  galleryPreviewItems=Array.from(e.target.files||[]).filter(f=>f.type.startsWith("image/")).map(f=>({file:f,url:URL.createObjectURL(f)}));
+  renderGalleryPreview();
+});
