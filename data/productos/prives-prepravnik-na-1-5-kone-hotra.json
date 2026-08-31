@@ -6,10 +6,11 @@
   "vyrobce": "HOTRA (Nizozemsko)",
   "rokVyroby": 2008,
   "provozniHmotnostKg": 550,
-  "celkovaHmotnostKg": 1299,
-  "uzitecnaHmotnostKg": 749,
+  "celkovaHmotnostKg": 1300,
+  "uzitecnaHmotnostKg": 750,
   "stk": "08/2028",
   "descripcion": "Kvalitní přívěs pro 1.5 koně HOTRA v dobrém stavu. Podlaha, brzdy, nájezdovka 100% stav, protiskluzová guma rampa i podlaha, okopy, krmný žlab, nové pneu.",
+  "datumPridani": "2026-08-31T18:33:10.169Z",
   "imagen": "/img/galeria/prives-prepravnik-na-1-5-kone-hotra/222974754-1788201172825.jpg",
   "galeria": [
     {
@@ -36,6 +37,5 @@
     {
       "imagen": "/img/galeria/prives-prepravnik-na-1-5-kone-hotra/222974754-1-1788201188078.jpg"
     }
-  ],
-  "datumPridani": "2026-08-31T18:33:10.169Z"
+  ]
 }
