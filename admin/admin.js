@@ -30,7 +30,7 @@ $("cancelBtn").onclick=resetForm;
 
 function resetForm(){
   currentProduct=null;
-  $("productForm").reset();
+  $("productForm").reset(); $("manufacturerSelect").value=""; $("manufacturerCustom").value="";
   $("originalSlug").value="";
   $("formTitle").textContent="Nový přívěs";
   $("mainPreview").innerHTML="";
@@ -46,7 +46,10 @@ function fillForm(p){
   $("name").value=p.nombre||"";
   $("price").value=p.precio||"";
   $("category").value=p.categoria||"ostatni";
-  $("manufacturer").value=p.vyrobce||"";
+  const maker = p.vyrobce || "";
+  const makerOption = [...$("manufacturerSelect").options].find(o => o.value === maker);
+  $("manufacturerSelect").value = makerOption ? maker : "";
+  $("manufacturerCustom").value = makerOption ? "" : maker;
   $("year").value=p.rokVyroby||"";
   $("weight").value=p.provozniHmotnostKg??"";
   $("totalWeight").value=p.celkovaHmotnostKg??"";
@@ -126,7 +129,7 @@ $("productForm").addEventListener("submit",async e=>{
       nombre:name,
       precio:$("price").value.trim(),
       categoria:$("category").value,
-      vyrobce:$("manufacturer").value.trim(),
+      vyrobce:($("manufacturerCustom").value.trim() || $("manufacturerSelect").value),
       rokVyroby:$("year").value?Number($("year").value):null,
       provozniHmotnostKg:operating,
       celkovaHmotnostKg:total,

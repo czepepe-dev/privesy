@@ -50,9 +50,59 @@
 <div class="grid">
 <div class="full"><label>Název</label><input id="name" required></div>
 <div><label>Cena</label><input id="price" placeholder="69 000 Kč" required></div>
-<div><label>Kategorie</label><select id="category"><option value="prepravniky">Přívěsy na koně</option><option value="nakladni-privesy">Nákladní přívěsy</option><option value="ostatni">Ostatní</option></select></div>
-<div><label>Výrobce</label><input id="manufacturer"></div>
-<div><label>Rok výroby</label><input id="year" type="number" min="1900" max="2100"></div>
+<div><label>Kategorie</label><select id="category"><option value="prepravniky">Přívěsy na koně</option><option value="nakladni-privesy">Nákladní přívěsy</option><option value="ostatni">Prodané přívěsy</option></select></div>
+<div>
+            <label>Výrobce</label>
+            <select id="manufacturerSelect">
+              <option value="">— vyber výrobce —</option>
+              <option value="Ablas (Německo)">Ablas (Německo)</option>
+              <option value="Agados (Česká republika)">Agados (Česká republika)</option>
+              <option value="Anssems (Nizozemsko)">Anssems (Nizozemsko)</option>
+              <option value="Atec XX-trail (Nizozemsko)">Atec XX-trail (Nizozemsko)</option>
+              <option value="AVG (Nizozemsko)">AVG (Nizozemsko)</option>
+              <option value="Bateson (Velká Británie)">Bateson (Velká Británie)</option>
+              <option value="Blomert (Německo)">Blomert (Německo)</option>
+              <option value="Böckmann (Německo)">Böckmann (Německo)</option>
+              <option value="Brenderup (Dánsko + Švédsko)">Brenderup (Dánsko + Švédsko)</option>
+              <option value="Debon (Francie)">Debon (Francie)</option>
+              <option value="Eduard (Nizozemsko)">Eduard (Nizozemsko)</option>
+              <option value="Fautras (Francie)">Fautras (Francie)</option>
+              <option value="Fripaan (Nizozemsko)">Fripaan (Nizozemsko)</option>
+              <option value="Hapert (Nizozemsko)">Hapert (Nizozemsko)</option>
+              <option value="Heja (Nizozemsko)">Heja (Nizozemsko)</option>
+              <option value="Henra (Nizozemsko)">Henra (Nizozemsko)</option>
+              <option value="Hotra (Nizozemsko)">Hotra (Nizozemsko)</option>
+              <option value="Humbaur (Německo)">Humbaur (Německo)</option>
+              <option value="Hulco (Nizozemsko)">Hulco (Nizozemsko)</option>
+              <option value="Ifor Williams (Velká Británie)">Ifor Williams (Velká Británie)</option>
+              <option value="Impex (Nizozemsko)">Impex (Nizozemsko)</option>
+              <option value="Knott (Německo)">Knott (Německo)</option>
+              <option value="Ley (Německo)">Ley (Německo)</option>
+              <option value="Lorries (Polsko)">Lorries (Polsko)</option>
+              <option value="Mustang (Dánsko)">Mustang (Dánsko)</option>
+              <option value="Niewiadow (Polsko)">Niewiadow (Polsko)</option>
+              <option value="Paradiso (Nizozemsko)">Paradiso (Nizozemsko)</option>
+              <option value="Proline (Polsko)">Proline (Polsko)</option>
+              <option value="Saris (Nizozemsko)">Saris (Nizozemsko)</option>
+              <option value="SchoutCar (Nizozemsko)">SchoutCar (Nizozemsko)</option>
+              <option value="Sluis (Nizozemsko)">Sluis (Nizozemsko)</option>
+              <option value="Sorel (Polsko)">Sorel (Polsko)</option>
+              <option value="TEMAred (Polsko)">TEMAred (Polsko)</option>
+              <option value="Thiel (Německo)">Thiel (Německo)</option>
+              <option value="Titan Jelsum (Nizozemsko)">Titan Jelsum (Nizozemsko)</option>
+              <option value="Variant (Dánsko)">Variant (Dánsko)</option>
+              <option value="Veskos (Česká republika)">Veskos (Česká republika)</option>
+              <option value="VDM (Belgie)">VDM (Belgie)</option>
+              <option value="Waco (Nizozemsko)">Waco (Nizozemsko)</option>
+              <option value="Weijer (Nizozemsko)">Weijer (Nizozemsko)</option>
+              <option value="Wesco (Nizozemsko)">Wesco (Nizozemsko)</option>
+              <option value="Westeria (Německo)">Westeria (Německo)</option>
+              <option value="Westfalia (Německo)">Westfalia (Německo)</option>
+              <option value="Wörmann (Německo)">Wörmann (Německo)</option>
+              <option value="Zuidema (Nizozemsko)">Zuidema (Nizozemsko)</option>
+            </select>
+            <input id="manufacturerCustom" placeholder="Jiný výrobce – napiš ručně" style="margin-top:8px">
+          </div><div><label>Rok výroby</label><input id="year" type="number" min="1900" max="2100"></div>
 <div><label>Provozní hmotnost (kg)</label><input id="weight" type="number" min="0"></div>
 <div><label>Celková hmotnost (kg)</label><input id="totalWeight" type="number" min="0"></div>
 <div><label>Užitečná hmotnost / nosnost (kg)</label><input id="payload" class="calculated" type="number" readonly title="Automaticky: celková hmotnost − provozní hmotnost"></div>
