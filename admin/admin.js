@@ -30,7 +30,7 @@ $("cancelBtn").onclick=resetForm;
 
 function resetForm(){
   currentProduct=null;
-  $("productForm").reset(); $("manufacturerSelect").value=""; $("manufacturerCustom").value="";
+  $("productForm").reset();
   $("originalSlug").value="";
   $("formTitle").textContent="Nový přívěs";
   $("mainPreview").innerHTML="";
@@ -46,10 +46,7 @@ function fillForm(p){
   $("name").value=p.nombre||"";
   $("price").value=p.precio||"";
   $("category").value=p.categoria||"ostatni";
-  const maker = p.vyrobce || "";
-  const makerOption = [...$("manufacturerSelect").options].find(o => o.value === maker);
-  $("manufacturerSelect").value = makerOption ? maker : "";
-  $("manufacturerCustom").value = makerOption ? "" : maker;
+  $("manufacturer").value=p.vyrobce||"";
   $("year").value=p.rokVyroby||"";
   $("weight").value=p.provozniHmotnostKg??"";
   $("totalWeight").value=p.celkovaHmotnostKg??"";
@@ -129,7 +126,7 @@ $("productForm").addEventListener("submit",async e=>{
       nombre:name,
       precio:$("price").value.trim(),
       categoria:$("category").value,
-      vyrobce:($("manufacturerCustom").value.trim() || $("manufacturerSelect").value),
+      vyrobce:$("manufacturer").value.trim(),
       rokVyroby:$("year").value?Number($("year").value):null,
       provozniHmotnostKg:operating,
       celkovaHmotnostKg:total,
@@ -157,3 +154,88 @@ $("productForm").addEventListener("submit",async e=>{
 });
 
 (async()=>{try{await api("/api/admin/me");showApp();}catch{showLogin();}})();
+
+
+// --- Náhled a změna pořadí fotogalerie před uložením ---
+let galleryItems = [];
+let galleryDragIndex = null;
+
+function renderGalleryPreview() {
+  const box = document.getElementById("galleryPreview");
+  if (!box) return;
+  box.innerHTML = "";
+  galleryItems.forEach((item, index) => {
+    const wrap = document.createElement("div");
+    wrap.className = "gallery-item";
+    wrap.draggable = true;
+    wrap.dataset.index = index;
+
+    const img = document.createElement("img");
+    img.src = item.preview;
+    img.alt = "Náhled fotografie " + (index + 1);
+
+    const pos = document.createElement("div");
+    pos.className = "gallery-pos";
+    pos.textContent = "Pozice " + (index + 1);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "gallery-remove";
+    remove.textContent = "×";
+    remove.title = "Odebrat fotografii";
+    remove.addEventListener("click", (e) => {
+      e.stopPropagation();
+      galleryItems.splice(index, 1);
+      renderGalleryPreview();
+    });
+
+    wrap.appendChild(img);
+    wrap.appendChild(pos);
+    wrap.appendChild(remove);
+
+    wrap.addEventListener("dragstart", () => {
+      galleryDragIndex = index;
+      wrap.classList.add("dragging");
+    });
+    wrap.addEventListener("dragend", () => {
+      galleryDragIndex = null;
+      wrap.classList.remove("dragging");
+    });
+    wrap.addEventListener("dragover", (e) => e.preventDefault());
+    wrap.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (galleryDragIndex === null || galleryDragIndex === index) return;
+      const moved = galleryItems.splice(galleryDragIndex, 1)[0];
+      galleryItems.splice(index, 0, moved);
+      renderGalleryPreview();
+    });
+
+    box.appendChild(wrap);
+  });
+}
+
+function initGalleryPreview() {
+  const input = document.querySelector('input[type="file"][multiple]') || document.querySelector('input[type="file"]');
+  if (!input) return;
+  input.addEventListener("change", () => {
+    const files = Array.from(input.files || []);
+    files.forEach(file => {
+      if (!file.type.startsWith("image/")) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        galleryItems.push({file, preview:e.target.result, existing:false});
+        renderGalleryPreview();
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initGalleryPreview);
+
+
+function getGalleryFilesInOrder() {
+  return galleryItems.filter(x => x.file).map(x => x.file);
+}
+
+// Galerie: pořadí položek v galleryItems je autoritativní pořadí náhledu před uložením.
