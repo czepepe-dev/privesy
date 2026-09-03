@@ -1,6 +1,6 @@
 {
   "nombre": "3.5t přívěs - přepravník bagrů a strojů s rampou, hydraulika",
-  "precio": "69000",
+  "precio": "75000",
   "puvodniCena": null,
   "categoria": "nakladni-privesy",
   "vyrobce": "STAM (Nizozemsko)",
@@ -10,6 +10,7 @@
   "uzitecnaHmotnostKg": 2280,
   "stk": "08/2028",
   "descripcion": "Vzdálenost od středu spojky k zadní části vozidla: 555 cm\nŠířka: 213 cm\nRozvor kol: 142 cm\n\nPoužívaný sklopný přívěs na přepravu bagrů, strojů, zemědělské techniky atd., dobrý technický stav, kosmetické vady, ALU bočnice místy poškozené, 3 nápravy x 1200kg, sklopná nájezdová rampa, hydraulika nikdy nepoužívaná (chybí ovl. kabel, nelze odzkoušet, bez záruky).\n\nDovoz Holandsko. Nová STK do 8/2028.",
+  "datumPridani": "2026-09-03T22:01:03.284Z",
   "imagen": "/img/galeria/3-5t-prives-prepravnik-bagru-a-stroju-s-rampou-hydraulika/20260903_160148-1788472739731.jpg",
   "galeria": [
     {
@@ -66,6 +67,5 @@
     {
       "imagen": "/img/galeria/3-5t-prives-prepravnik-bagru-a-stroju-s-rampou-hydraulika/20260903_160843-1788472857551.jpg"
     }
-  ],
-  "datumPridani": "2026-09-03T22:01:03.284Z"
+  ]
 }
