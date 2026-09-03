@@ -5,70 +5,43 @@
   "categoria": "prepravniky",
   "vyrobce": "Böckmann (Německo)",
   "rokVyroby": 2007,
-  "provozniHmotnostKg": 2000,
-  "celkovaHmotnostKg": 750,
-  "uzitecnaHmotnostKg": -1250,
+  "provozniHmotnostKg": 750,
+  "celkovaHmotnostKg": 2000,
+  "uzitecnaHmotnostKg": 1250,
   "stk": "08/2028",
-  "descripcion": "Kvalitní dvoukoňový přepravník BÖCKMANN se samostatnou sedlovnou, rok výroby 2007. Přívěs je v dobrém technickém stavu a je připraven k používání.\n\n### Technické údaje\n- **Výrobce:** BÖCKMANN, Německo\n- **Rok výroby:** 2007\n- **Určen pro:** 2 koně\n- **Provozní hmotnost:** 750 kg\n- **Celková hmotnost:** 2 000 kg\n- **Užitečná hmotnost (nosnost):** 1 250 kg\n- **Dovoz:** Nizozemsko\n- **STK:** platná do 08/2028\n\n### Výbava a stav\n- samostatná sedlovna\n- podlaha ve 100% stavu\n- brzdy ve 100% stavu\n- nájezdová brzda ve 100% stavu\n- protiskluzová guma na podlaze a rampě\n- okopy\n- nové pneumatiky\n- zadní nájezdová rampa\n- větrací okna",
-  "datumPridani": "2026-08-30T22:00:00.000Z",
-  "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-31-8-2026-23_46_05-1788212965427.png",
+  "descripcion": "Kvalitní dvoukoňový přepravník BÖCKMANN se samostatnou sedlovnou, rok výroby 2007. Přívěs je v dobrém technickém stavu a je připraven k používání.\n\nVýbava a stav\n- samostatná sedlovna\n- podlaha ve 100% stavu\n- brzdy ve 100% stavu\n- nájezdová brzda ve 100% stavu\n- protiskluzová guma na podlaze a rampě\n- okopy\n- nové pneumatiky\n- zadní nájezdová rampa\n- větrací okna",
+  "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_23_20-1788473733744.png",
   "galeria": [
     {
-      "imagen": "/img/galeria/bockmann-2-kone-2007/bockmann-2007-01.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_23_20-1788473739029.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-2-kone-2007/bockmann-2007-02.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_23_56-1788473743463.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-2-kone-2007/bockmann-2007-03.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_22_55-1788473748042.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-2-kone-2007/bockmann-2007-04.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_25_55-1788473752666.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-25-8-2026-01_45_31-1788128014690.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_25_36-1788473757160.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-25-8-2026-01_48_58-1788128018628.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_28_41-1788473762525.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-25-8-2026-01_49_33-1788128022473.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_29_50-1788473767099.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-25-8-2026-01_49_58-1788128026253.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_29_37-1788473771136.png"
     },
     {
-      "imagen": "/img/galeria/bockmann-prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-25-8-2026-01_51_04-1788128030044.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_31_01-1788473774968.png"
     },
     {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_23_20-1788472044870.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_23_56-1788472050035.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_22_55-1788472056190.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_25_55-1788472061269.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_25_36-1788472066007.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_29_50-1788472070854.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_28_41-1788472075023.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_29_37-1788472079636.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_19_46-1788472083163.png"
-    },
-    {
-      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_31_01-1788472087595.png"
+      "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_19_46-1788473780806.png"
     }
-  ]
+  ],
+  "datumPridani": "2026-09-03T22:16:25.344Z"
 }
