@@ -1,8 +1,8 @@
 {
   "nombre": "Přepravník pro 2 koně se sedlovnou",
-  "precio": "69.000,-Kč",
-  "puvodniCena": null,
-  "categoria": "prepravniky",
+  "precio": "PRODÁNO",
+  "puvodniCena": "69.000,-Kč",
+  "categoria": "ostatni",
   "vyrobce": "Böckmann (Německo)",
   "rokVyroby": 2007,
   "provozniHmotnostKg": 750,
@@ -10,6 +10,7 @@
   "uzitecnaHmotnostKg": 1250,
   "stk": "08/2028",
   "descripcion": "Kvalitní dvoukoňový přepravník BÖCKMANN se samostatnou sedlovnou, rok výroby 2007. Přívěs je v dobrém technickém stavu a je připraven k používání.\n\nVýbava a stav\n- samostatná sedlovna\n- podlaha ve 100% stavu\n- brzdy ve 100% stavu\n- nájezdová brzda ve 100% stavu\n- protiskluzová guma na podlaze a rampě\n- okopy\n- nové pneumatiky\n- zadní nájezdová rampa\n- větrací okna",
+  "datumPridani": "2026-09-03T22:16:25.344Z",
   "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_23_20-1788473733744.png",
   "galeria": [
     {
@@ -42,6 +43,5 @@
     {
       "imagen": "/img/galeria/prepravnik-pro-2-kone-se-sedlovnou/ChatGPT-Image-3-9-2026-23_19_46-1788473780806.png"
     }
-  ],
-  "datumPridani": "2026-09-03T22:16:25.344Z"
+  ]
 }
