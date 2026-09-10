@@ -23,6 +23,8 @@
     .product-price { font-size:26px; font-weight:bold; margin:15px 0; }
     .product-description { margin:0 0 25px; line-height:1.6; white-space:normal; }
     .product-description p:first-child { margin-top:0; }
+    .equipment-list { margin:0 0 25px; padding-left:20px; line-height:1.7; }
+    .equipment-list li { margin:2px 0; }
     .product-specs { margin:20px 0 25px; border-top:1px solid #eee; border-bottom:1px solid #eee; }
     .spec-row { display:flex; justify-content:space-between; gap:20px; padding:10px 0; border-bottom:1px solid #eee; }
     .spec-row:last-child { border-bottom:0; }
@@ -103,8 +105,14 @@
 
         <div id="p-specs" class="product-specs"></div>
 
-        <h2 id="popis-heading" style="margin-bottom:10px;">Popis</h2>
-        <div id="p-popis" class="product-description"></div>
+        <div id="equipment-section" style="display:none;">
+          <h2 style="margin-bottom:10px;">Výbava a stav</h2>
+          <ul id="p-equipment" class="equipment-list"></ul>
+        </div>
+        <div id="additional-section" style="display:none;">
+          <h2 style="margin-bottom:10px;">Další</h2>
+          <div id="p-dalsi" class="product-description"></div>
+        </div>
 
         <div class="produkt-buttons">
           <button class="produkt-btn" style="height:50px;" onclick="window.location.href='contacto.html'">KONTAKT</button>
@@ -251,24 +259,40 @@
         addSpec("Kategorie", data.categoria === "prepravniky" ? "Přívěsy na koně" :
           data.categoria === "nakladni-privesy" ? "Nákladní přívěsy" : "Prodané přívěsy");
         addSpec("Výrobce", data.vyrobce);
-        addSpec("Rok výroby", data.rokVyroby);
-        addSpec("Provozní hmotnost", formatKg(data.provozniHmotnostKg));
-        addSpec("Celková hmotnost", formatKg(data.celkovaHmotnostKg));
-        addSpec("Užitečná hmotnost / nosnost", formatKg(data.uzitecnaHmotnostKg, true));
+        const yearValue = data.rokVyroby
+          ? (data.rokVyrobyMesic ? `${String(data.rokVyrobyMesic).padStart(2,"0")}/${data.rokVyroby}` : data.rokVyroby)
+          : "";
+        addSpec("Rok výroby", yearValue);
+        addSpec("Celková hmotnost (kg)", formatKg(data.celkovaHmotnostKg));
+        addSpec("Provozní hmotnost (kg)", formatKg(data.provozniHmotnostKg));
+        addSpec("Užitečná hmotnost / nosnost (kg)", formatKg(data.uzitecnaHmotnostKg, true));
         addSpec("STK", data.stk);
 
-        const popis = document.getElementById("p-popis");
-        const description = String(data.descripcion || "").trim();
-        if (description) {
+        const equipment = Array.isArray(data.vybava) ? data.vybava.filter(Boolean) : [];
+        const equipmentSection = document.getElementById("equipment-section");
+        const equipmentList = document.getElementById("p-equipment");
+        equipmentList.innerHTML = "";
+        equipment.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          equipmentList.appendChild(li);
+        });
+        equipmentSection.style.display = equipment.length ? "" : "none";
+
+        const dalsi = String(data.dalsi ?? data.descripcion ?? "").trim();
+        const additionalSection = document.getElementById("additional-section");
+        const additional = document.getElementById("p-dalsi");
+        additionalSection.style.display = dalsi ? "" : "none";
+        if (dalsi) {
           try {
-            popis.innerHTML = (window.marked && typeof marked.parse === "function")
-              ? marked.parse(description)
-              : description.replace(/\n/g, "<br>");
-        } catch {
-          popis.textContent = description;
-        }
+            additional.innerHTML = (window.marked && typeof marked.parse === "function")
+              ? marked.parse(dalsi)
+              : dalsi.replace(/\n/g, "<br>");
+          } catch {
+            additional.textContent = dalsi;
+          }
         } else {
-          popis.innerHTML = "<span style='color:#777;'>Popis není uveden.</span>";
+          additional.innerHTML = "";
         }
 
         buildLightboxImages(data);
@@ -290,7 +314,8 @@
         document.getElementById("p-img").onclick = () => openLightbox(0);
       } catch (e) {
         document.getElementById("p-nazev").textContent = "Přívěs se nepodařilo načíst.";
-        document.getElementById("p-popis").textContent = e.message || "";
+        const additional = document.getElementById("p-dalsi");
+        if (additional) additional.textContent = e.message || "";
       }
     }
 

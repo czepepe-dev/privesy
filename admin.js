@@ -14,6 +14,23 @@ function showApp(){ $("login").classList.add("hidden"); $("app").classList.remov
 function slugify(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80); }
 function setStatus(el,msg,ok=false){ el.textContent=msg; el.style.color=ok?"#176b3a":"#b42318"; }
 
+function getEquipmentValues(){
+  return [...document.querySelectorAll('#equipment input[type="checkbox"]:checked')].map(x => x.value);
+}
+function setEquipmentValues(values){
+  const selected = new Set(Array.isArray(values) ? values : []);
+  document.querySelectorAll('#equipment input[type="checkbox"]').forEach(x => { x.checked = selected.has(x.value); });
+}
+function updatePayload(){
+  const total = Number($("totalWeight").value);
+  const operating = Number($("weight").value);
+  if (Number.isFinite(total) && total > 0 && Number.isFinite(operating) && operating >= 0) {
+    $("payload").value = Math.max(0, total - operating);
+  } else {
+    $("payload").value = "";
+  }
+}
+
 $("loginForm").addEventListener("submit", async e=>{
   e.preventDefault(); setStatus($("loginStatus"),"Přihlašuji...",true);
   try { await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:$("password").value})}); $("password").value=""; showApp(); }
@@ -22,26 +39,51 @@ $("loginForm").addEventListener("submit", async e=>{
 $("logoutBtn").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});showLogin();};
 $("newBtn").onclick=resetForm;
 $("cancelBtn").onclick=resetForm;
+$("totalWeight").addEventListener("input",updatePayload);
+$("weight").addEventListener("input",updatePayload);
 
 function resetForm(){
-  currentProduct=null; $("productForm").reset(); $("originalSlug").value=""; $("manufacturerCustom").value=""; $("manufacturerSelect").value="";
-  $("formTitle").textContent="Nový přívěs"; $("mainPreview").innerHTML=""; $("galleryPreview").innerHTML=""; $("saveStatus").textContent="";
+  currentProduct=null;
+  $("productForm").reset();
+  $("originalSlug").value="";
+  $("manufacturerCustom").value="";
+  $("manufacturerSelect").value="";
+  setEquipmentValues([]);
+  $("formTitle").textContent="Nový přívěs";
+  $("mainPreview").innerHTML="";
+  $("galleryPreview").innerHTML="";
+  $("saveStatus").textContent="";
+  updatePayload();
 }
+
 function fillForm(p){
-  currentProduct=p; $("originalSlug").value=p.slug||""; $("formTitle").textContent="Upravit přívěs";
-  $("name").value=p.nombre||""; $("price").value=p.precio||""; $("category").value=p.categoria||"ostatni";
+  currentProduct=p;
+  $("originalSlug").value=p.slug||"";
+  $("formTitle").textContent="Upravit přívěs";
+  $("name").value=p.nombre||"";
+  $("price").value=p.precio||"";
+  $("category").value=p.categoria||"ostatni";
   const maker = p.vyrobce || "";
   const makerOption = [...$("manufacturerSelect").options].find(o => o.value === maker);
   $("manufacturerSelect").value = makerOption ? maker : "";
   $("manufacturerCustom").value = makerOption ? "" : maker;
   $("year").value=p.rokVyroby||"";
-  $("weight").value=p.provozniHmotnostKg||""; $("totalWeight").value=p.celkovaHmotnostKg||""; $("payload").value=p.uzitecnaHmotnostKg||"";
-  $("stk").value=p.stk||""; $("description").value=p.descripcion||"";
-  $("mainImage").value=""; $("gallery").value="";
+  $("month").value=p.rokVyrobyMesic||"";
+  $("weight").value=p.provozniHmotnostKg||"";
+  $("totalWeight").value=p.celkovaHmotnostKg||"";
+  $("payload").value=p.uzitecnaHmotnostKg||"";
+  updatePayload();
+  $("stk").value=p.stk||"";
+  setEquipmentValues(p.vybava);
+  // U starších záznamů použij původní Popis jako obsah pole Další, aby se nic neztratilo.
+  $("additional").value=(p.dalsi ?? p.descripcion ?? "");
+  $("mainImage").value="";
+  $("gallery").value="";
   $("mainPreview").innerHTML=p.imagen?`<img class="thumb" src="${p.imagen}">`:"";
   $("galleryPreview").innerHTML=(p.galeria||[]).map(x=>`<img class="thumb" src="${x.imagen}">`).join("");
   window.scrollTo({top:0,behavior:"smooth"});
 }
+
 async function loadProducts(){
   try{
     const data=await api("/api/admin/products");
@@ -68,9 +110,10 @@ async function uploadImage(file, slug){
   for(let i=0;i<arr.length;i+=0x8000) binary+=String.fromCharCode(...arr.subarray(i,i+0x8000));
   const content=btoa(binary);
   const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const safe=(file.name.replace(/\.[^.]+$/,"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"foto");
+  const safe=(file.name.replace(/\.[^.]+$/," ").trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"foto");
   return api("/api/admin/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug,filename:`${safe}-${Date.now()}.${ext}`,content})});
 }
+
 $("productForm").addEventListener("submit",async e=>{
   e.preventDefault(); setStatus($("saveStatus"),"Ukládám...",true);
   try{
@@ -79,14 +122,22 @@ $("productForm").addEventListener("submit",async e=>{
     const old=currentProduct;
     const mainFile=$("mainImage").files[0];
     const galleryFiles=[...$("gallery").files];
+    const total = $("totalWeight").value ? Number($("totalWeight").value) : null;
+    const operating = $("weight").value ? Number($("weight").value) : null;
+    const payload = (total !== null && operating !== null) ? Math.max(0, total - operating) : null;
     const product={
-      nombre:name, precio:$("price").value.trim(), categoria:$("category").value,
+      nombre:name,
+      precio:$("price").value.trim(),
+      categoria:$("category").value,
       vyrobce:($("manufacturerCustom").value.trim() || $("manufacturerSelect").value),
       rokVyroby:$("year").value?Number($("year").value):null,
-      provozniHmotnostKg:$("weight").value?Number($("weight").value):null,
-      celkovaHmotnostKg:$("totalWeight").value?Number($("totalWeight").value):null,
-      uzitecnaHmotnostKg:$("payload").value?Number($("payload").value):null,
-      stk:$("stk").value.trim(), descripcion:$("description").value
+      rokVyrobyMesic:$("month").value?Number($("month").value):null,
+      celkovaHmotnostKg:total,
+      provozniHmotnostKg:operating,
+      uzitecnaHmotnostKg:payload,
+      stk:$("stk").value.trim(),
+      vybava:getEquipmentValues(),
+      dalsi:$("additional").value.trim()
     };
     if(old?.datumPridani) product.datumPridani=old.datumPridani;
     if(old?.imagen) product.imagen=old.imagen;

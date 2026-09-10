@@ -15,3 +15,29 @@ INSTALACE NOVÉ ADMINISTRACE
 
 ADMIN:
 https://privesy.pages.dev/admin/
+
+
+AKTUALIZACE WEBU – VERZE S VÝBAVOU, DALŠÍM A OG NÁHLEDEM
+
+Tato verze obsahuje:
+- Výbava a stav: zaškrtávací pole; v detailu se zobrazí pouze zaškrtnuté položky.
+- Další: doplňující textové pole; v detailu se zobrazí jen pokud je vyplněné.
+- Rok výroby + volitelný měsíc výroby.
+- Hmotnosti v pořadí: Celková, Provozní, Užitečná / nosnost.
+- Odstranění tří starých produktů solar/powerbank z původního webu.
+- Nový og-image.png pro náhled odkazu při sdílení (např. WhatsApp).
+
+POSTUP AKTUALIZACE CELÉHO WEBU:
+1. Rozbal tento ZIP.
+2. V GitHubu otevři repozitář czepepe-dev/privesy.
+3. Nahraď obsah repozitáře soubory z rozbaleného ZIPu. Nejbezpečnější je nahradit celý obsah projektu, aby se odstranily i tři staré JSON produkty.
+4. Zkontroluj, že zůstaly zachované složky admin/, functions/, data/productos/ a netlify/.
+5. Commitni změny do větve main a pushni je do GitHubu.
+6. Cloudflare Pages následně automaticky vytvoří nový deploy.
+7. Po dokončení otevři https://privesy.pages.dev/admin/ a přihlas se.
+8. Zkontroluj, že v administraci už nejsou Power Bank Solar Carga Rápida, Cargador solar portátil USB a Lámpara Solar de 3 Cabezales.
+9. Otevři existující přívěs a ověř Výbavu a stav, Další, měsíc výroby a hmotnosti.
+
+NÁHLED VE WHATSAPP:
+- index.html nyní používá /og-image.png místo původního /logo.png.
+- WhatsApp a další služby si náhledy často ukládají do cache. Po nasazení tedy nemusí změna být vidět okamžitě; je potřeba chvíli počkat a případně sdílení zkusit znovu.

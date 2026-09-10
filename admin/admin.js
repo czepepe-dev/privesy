@@ -51,11 +51,13 @@ function fillForm(p){
   $("manufacturerSelect").value=makerOption?maker:"";
   $("manufacturerCustom").value=makerOption?"":maker;
   $("year").value=p.rokVyroby||"";
+  $("month").value=p.rokVyrobyMesic||"";
   $("weight").value=p.provozniHmotnostKg??"";
   $("totalWeight").value=p.celkovaHmotnostKg??"";
   updatePayload();
   $("stk").value=p.stk||"";
-  $("description").value=p.descripcion||"";
+  $("equipment").querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.checked=Array.isArray(p.vybava)&&p.vybava.includes(cb.value));
+  $("additional").value=p.dalsi ?? p.descripcion ?? "";
   $("mainImage").value="";
   $("gallery").value=""; galleryPreviewItems=[]; renderGalleryPreview();
   $("mainPreview").innerHTML=p.imagen?`<img class="thumb" src="${p.imagen}">`:"";
@@ -136,11 +138,13 @@ $("productForm").addEventListener("submit",async e=>{
       categoria:$("category").value,
       vyrobce:($("manufacturerCustom").value.trim() || $("manufacturerSelect").value),
       rokVyroby:$("year").value?Number($("year").value):null,
+      rokVyrobyMesic:$("month").value?Number($("month").value):null,
       provozniHmotnostKg:operating,
       celkovaHmotnostKg:total,
       uzitecnaHmotnostKg:payload,
       stk:$("stk").value.trim(),
-      descripcion:$("description").value
+      vybava:[...$("equipment").querySelectorAll('input[type="checkbox"]:checked')].map(cb=>cb.value),
+      dalsi:$("additional").value.trim()
     };
 
     if(old?.datumPridani) product.datumPridani=old.datumPridani;
