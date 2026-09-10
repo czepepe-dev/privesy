@@ -10,7 +10,8 @@
   "uzitecnaHmotnostKg": 1170,
   "stk": "09/2028",
   "descripcion": "Popis a další foto se připravují",
-  "imagen": "/img/galeria/celolaminatovy-xl-prives-pro-2-kone/ChatGPT-Image-10-9-2026-00_00_01-1789065878653.png",
+  "datumPridani": "2026-09-10T18:44:59.648Z",
+  "imagen": "/img/galeria/celolaminatovy-xl-prives-pro-2-kone/ChatGPT-Image-10-9-2026-00_00_01-1789066190063.png",
   "galeria": [
     {
       "imagen": "/img/galeria/celolaminatovy-xl-prives-pro-2-kone/ChatGPT-Image-9-9-2026-23_56_23-1789065884452.png"
@@ -21,6 +22,5 @@
     {
       "imagen": "/img/galeria/celolaminatovy-xl-prives-pro-2-kone/ChatGPT-Image-9-9-2026-23_48_48-1789065895056.png"
     }
-  ],
-  "datumPridani": "2026-09-10T18:44:59.648Z"
+  ]
 }
