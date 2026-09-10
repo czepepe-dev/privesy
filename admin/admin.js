@@ -1,5 +1,6 @@
 const $ = id => document.getElementById(id);
 let currentProduct = null;
+let equipmentOptions = [];
 
 async function api(url, options={}) {
   const r = await fetch(url, {credentials:"same-origin", ...options});
@@ -10,7 +11,12 @@ async function api(url, options={}) {
   return data;
 }
 function showLogin(){ $("login").classList.remove("hidden"); $("app").classList.add("hidden"); }
-function showApp(){ $("login").classList.add("hidden"); $("app").classList.remove("hidden"); loadProducts(); }
+async function showApp(){
+  $("login").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  await loadEquipment();
+  loadProducts();
+}
 function slugify(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,80); }
 function setStatus(el,msg,ok=false){ el.textContent=msg; el.style.color=ok?"#176b3a":"#b42318"; }
 
@@ -28,6 +34,57 @@ $("logoutBtn").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});
 $("newBtn").onclick=resetForm;
 $("cancelBtn").onclick=resetForm;
 
+function renderEquipmentOptions(){
+  const box=$("equipment");
+  if(!box)return;
+  const checked=new Set([...box.querySelectorAll('input[type="checkbox"]:checked')].map(cb=>cb.value));
+  box.innerHTML=equipmentOptions.map(item=>{
+    const safe=escapeHtml(item);
+    return `<label><input type="checkbox" value="${escapeAttr(item)}"${checked.has(item)?" checked":""}> ${safe}</label>`;
+  }).join("");
+}
+
+async function loadEquipment(){
+  try{
+    const data=await api("/api/admin/equipment");
+    equipmentOptions=Array.isArray(data.items)?data.items.filter(Boolean):[];
+    renderEquipmentOptions();
+    $("equipmentStatus").textContent="";
+  }catch(err){
+    $("equipmentStatus").textContent="Seznam výbavy se nepodařilo načíst: "+err.message;
+  }
+}
+
+async function addEquipmentOption(){
+  const input=$("customEquipment");
+  const value=input.value.trim();
+  if(!value){
+    setStatus($("equipmentStatus"),"Napiš nejdříve název nové výbavy nebo stavu.");
+    input.focus();
+    return;
+  }
+  setStatus($("equipmentStatus"),"Přidávám...",true);
+  try{
+    const data=await api("/api/admin/equipment",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({item:value})
+    });
+    equipmentOptions=Array.isArray(data.items)?data.items.filter(Boolean):equipmentOptions;
+    renderEquipmentOptions();
+    const cb=[...$("equipment").querySelectorAll('input[type="checkbox"]')].find(x=>x.value===data.item);
+    if(cb)cb.checked=true;
+    input.value="";
+    setStatus($("equipmentStatus"),data.created?"Nová položka byla přidána do trvalého seznamu.":"Tato položka už v seznamu je.",true);
+    input.focus();
+  }catch(err){setStatus($("equipmentStatus"),err.message);}
+}
+
+$("addEquipmentBtn")?.addEventListener("click",addEquipmentOption);
+$("customEquipment")?.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();addEquipmentOption();}
+});
+
 function resetForm(){
   currentProduct=null;
   $("productForm").reset(); $("manufacturerSelect").value=""; $("manufacturerCustom").value="";
@@ -36,6 +93,9 @@ function resetForm(){
   $("mainPreview").innerHTML="";
   $("galleryPreview").innerHTML="";
   $("saveStatus").textContent="";
+  $("customEquipment").value="";
+  $("equipmentStatus").textContent="";
+  renderEquipmentOptions();
   updatePayload();
 }
 
@@ -56,6 +116,8 @@ function fillForm(p){
   $("totalWeight").value=p.celkovaHmotnostKg??"";
   updatePayload();
   $("stk").value=p.stk||"";
+  // Zobraz všechny centrálně uložené položky a zaškrtni ty, které patří k produktu.
+  renderEquipmentOptions();
   $("equipment").querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.checked=Array.isArray(p.vybava)&&p.vybava.includes(cb.value));
   $("additional").value=p.dalsi ?? p.descripcion ?? "";
   $("mainImage").value="";

@@ -136,6 +136,14 @@
     <label><input type="checkbox" value="zadní nájezdová rampa"> zadní nájezdová rampa</label>
     <label><input type="checkbox" value="hydraulika"> hydraulika</label>
   </div>
+  <div class="row" style="margin-top:10px;align-items:flex-end">
+    <div style="flex:1;min-width:240px">
+      <label for="customEquipment">Přidat vlastní výbavu / stav</label>
+      <input id="customEquipment" type="text" maxlength="120" placeholder="Např. LED osvětlení interiéru">
+    </div>
+    <button class="secondary" type="button" id="addEquipmentBtn">+ Přidat do seznamu</button>
+  </div>
+  <div id="equipmentStatus" class="muted" style="margin-top:6px"></div>
 </div>
 <div class="full"><label>Další</label><textarea id="additional" placeholder="Doplňující informace..."></textarea></div>
 <div class="full"><label>Hlavní fotografie</label><input id="mainImage" type="file" accept="image/*"><div id="mainPreview"></div></div>
