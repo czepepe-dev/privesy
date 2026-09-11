@@ -172,15 +172,52 @@ async function deleteProduct(slug){
   if(!confirm("Opravdu smazat tento přívěs?"))return;
   try{await api("/api/admin/products/"+encodeURIComponent(slug),{method:"DELETE"});if(currentProduct?.slug===slug)resetForm();loadProducts();}catch(err){alert(err.message);}
 }
-async function uploadImage(file, slug){
+async function prepareImage(file, maxDimension=1600, quality=0.78){
+  if(!file || !file.type.startsWith("image/")) throw new Error("Soubor není obrázek.");
+  const objectUrl=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((resolve,reject)=>{
+      const el=new Image();
+      el.onload=()=>resolve(el);
+      el.onerror=()=>reject(new Error("Obrázek se nepodařilo načíst."));
+      el.src=objectUrl;
+    });
+    const scale=Math.min(1,maxDimension/Math.max(img.naturalWidth,img.naturalHeight));
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));
+    canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+    const ctx=canvas.getContext("2d",{alpha:false});
+    ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/webp",quality));
+    if(!blob) throw new Error("Optimalizaci obrázku se nepodařilo dokončit.");
+    return new File([blob],"foto.webp",{type:"image/webp"});
+  }finally{ URL.revokeObjectURL(objectUrl); }
+}
+
+async function blobToBase64(file){
   const bytes=await file.arrayBuffer();
   let binary=""; const arr=new Uint8Array(bytes);
   for(let i=0;i<arr.length;i+=0x8000) binary+=String.fromCharCode(...arr.subarray(i,i+0x8000));
-  const content=btoa(binary);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const safe=(file.name.replace(/\.[^.]+$/,"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"foto");
-  return api("/api/admin/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug,filename:`${safe}-${Date.now()}.${ext}`,content})});
+  return btoa(binary);
 }
+
+async function uploadImage(file, slug, suffix="", maxDimension=1600, quality=0.78){
+  const optimized=await prepareImage(file,maxDimension,quality);
+  const safe=(file.name.replace(/\.[^.]+$/," ").trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"-").replace(/^-|-$/g,"").slice(0,60)||"foto");
+  const content=await blobToBase64(optimized);
+  return api("/api/admin/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug,filename:`${safe}-${Date.now()}${suffix}.webp`,content})});
+}
+
+function showMainPreview(file){
+  const box=$("mainPreview");
+  if(!box)return;
+  if(!file){ box.innerHTML=""; return; }
+  const url=URL.createObjectURL(file);
+  box.innerHTML=`<img class="thumb" src="${url}" alt="Náhled hlavní fotografie">`;
+  const img=box.querySelector("img");
+  img.onload=()=>URL.revokeObjectURL(url);
+}
+
 
 $("infoStock")?.addEventListener("change",e=>{
   if(e.target.checked) $("infoImport").checked=false;
@@ -188,6 +225,8 @@ $("infoStock")?.addEventListener("change",e=>{
 $("infoImport")?.addEventListener("change",e=>{
   if(e.target.checked) $("infoStock").checked=false;
 });
+
+$("mainImage")?.addEventListener("change",e=>showMainPreview(e.target.files[0]||null));
 
 $("productForm").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -231,10 +270,16 @@ $("productForm").addEventListener("submit",async e=>{
 
     if(old?.datumPridani) product.datumPridani=old.datumPridani;
     if(old?.imagen) product.imagen=old.imagen;
+    if(old?.imagenMiniatura) product.imagenMiniatura=old.imagenMiniatura;
     if(old?.galeria) product.galeria=old.galeria;
 
     if(!product.imagen && !mainFile) throw new Error("Vyber hlavní fotografii.");
-    if(mainFile){ const r=await uploadImage(mainFile,slug); product.imagen=r.url; }
+    if(mainFile){
+      const r=await uploadImage(mainFile,slug,"",1600,0.80);
+      product.imagen=r.url;
+      const thumb=await uploadImage(mainFile,slug,"-thumb",600,0.76);
+      product.imagenMiniatura=thumb.url;
+    }
     if(galleryFiles.length){
       product.galeria=product.galeria||[];
       for(const f of galleryFiles){ const r=await uploadImage(f,slug); product.galeria.push({imagen:r.url}); }

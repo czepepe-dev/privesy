@@ -678,3 +678,43 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
 
 /* Prodané přívěsy – stejná typografie jako cena, pouze červená */
 .cena-prodano{color:#d00;font:inherit;font-weight:inherit;}
+
+/* Rychlé načítání produktů – okamžitá vizuální odezva. */
+.products-loading {
+  min-height: 120px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.products-loading span {
+  width: 34px;
+  height: 34px;
+  border: 4px solid #d8d8d8;
+  border-top-color: #888;
+  border-radius: 50%;
+  animation: products-spin .8s linear infinite;
+}
+@keyframes products-spin { to { transform: rotate(360deg); } }
+
+@media (max-width:768px) {
+  /* Na mobilu není horní navigace ani hamburger potřeba. */
+  .mobile-menu-toggle { display:none !important; }
+  .topbar { padding:4px 8px !important; gap:0 !important; }
+  .logo img { max-height:78px !important; width:100% !important; }
+  body { padding-top:88px !important; }
+
+  .hero, .nuevos, .produkty-section { padding:14px 10px !important; }
+  .intro { margin-bottom:10px !important; }
+  .nuevos { margin-top:0 !important; }
+  .nuevos h2, .categorias h2 { margin-top:8px !important; margin-bottom:8px !important; }
+  .slider-wrapper { margin:4px auto 8px !important; }
+  #nove-produkty, #produkty, .produkty-grid { gap:12px !important; padding-top:4px !important; padding-bottom:4px !important; }
+  .produkt-card { min-height:0 !important; padding:10px !important; padding-bottom:12px !important; }
+  .produkt-card img { margin-bottom:6px !important; height:230px !important; }
+  .produkt-nazev { margin:6px 0 !important; }
+  .produkt-cena { margin-bottom:6px !important; }
+  .produkt-popis { margin-bottom:8px !important; }
+  .categorias .grid { padding:0 8px !important; margin-top:2px !important; gap:8px !important; }
+  .card { padding:8px !important; }
+}

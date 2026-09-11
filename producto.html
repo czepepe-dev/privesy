@@ -248,8 +248,12 @@
         if (!resp.ok) throw new Error("Produkt nebyl nalezen.");
         const data = await resp.json();
 
-        document.getElementById("p-img").src = data.imagen || "";
-        document.getElementById("p-img").alt = data.nombre || "";
+        const mainImg = document.getElementById("p-img");
+        mainImg.src = data.imagen || "";
+        mainImg.alt = data.nombre || "";
+        mainImg.loading = "eager";
+        mainImg.decoding = "async";
+        mainImg.fetchPriority = "high";
         document.getElementById("p-nazev").textContent = data.nombre || "";
         document.getElementById("p-cena").textContent = data.precio || "";
 
@@ -298,6 +302,8 @@
             if (!item || !item.imagen) return;
             const img = document.createElement("img");
             img.src = item.imagen;
+            img.loading = "lazy";
+            img.decoding = "async";
             img.alt = data.nombre || "";
             img.onclick = e => {
               e.stopPropagation();
