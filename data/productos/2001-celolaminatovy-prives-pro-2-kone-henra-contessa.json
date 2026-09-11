@@ -1,5 +1,5 @@
 {
-  "nombre": "Celolaminátový přívěs pro 2 koně HENRA Contessa",
+  "nombre": "2001 Celolaminátový přívěs pro 2 koně HENRA Contessa",
   "precio": "75.000,-Kč",
   "puvodniCena": null,
   "categoria": "prepravniky",
@@ -27,7 +27,9 @@
   "dalsiInfoTyp": "import",
   "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
   "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
+  "datumPridani": "2026-09-11T00:37:13.942Z",
   "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-henra-contessa/ChatGPT-Image-11-9-2026-00_15_22-1789086988189.webp",
+  "imagenMiniatura": "/img/galeria/celolaminatovy-prives-pro-2-kone-henra-contessa/ChatGPT-Image-11-9-2026-00_15_22-1789086988189-thumb.webp",
   "galeria": [
     {
       "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-henra-contessa/ChatGPT-Image-11-9-2026-00_15_22-1789086992720.webp"
@@ -59,7 +61,5 @@
     {
       "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-henra-contessa/ChatGPT-Image-11-9-2026-00_58_40-1789087029014.webp"
     }
-  ],
-  "datumPridani": "2026-09-11T00:37:13.942Z",
-  "imagenMiniatura": "/img/galeria/celolaminatovy-prives-pro-2-kone-henra-contessa/ChatGPT-Image-11-9-2026-00_15_22-1789086988189-thumb.webp"
+  ]
 }
