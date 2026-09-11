@@ -1,6 +1,8 @@
 const $ = id => document.getElementById(id);
 let currentProduct = null;
 let equipmentOptions = [];
+const DEFAULT_INFO_STOCK = "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.";
+const DEFAULT_INFO_IMPORT = "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.";
 
 async function api(url, options={}) {
   const r = await fetch(url, {credentials:"same-origin", ...options});
@@ -95,6 +97,10 @@ function resetForm(){
   $("saveStatus").textContent="";
   $("customEquipment").value="";
   $("equipmentStatus").textContent="";
+  $("infoStock").checked=false;
+  $("infoImport").checked=false;
+  $("infoStockText").value=DEFAULT_INFO_STOCK;
+  $("infoImportText").value=DEFAULT_INFO_IMPORT;
   renderEquipmentOptions();
   updatePayload();
 }
@@ -119,7 +125,11 @@ function fillForm(p){
   // Zobraz všechny centrálně uložené položky a zaškrtni ty, které patří k produktu.
   renderEquipmentOptions();
   $("equipment").querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.checked=Array.isArray(p.vybava)&&p.vybava.includes(cb.value));
-  $("additional").value=p.dalsi ?? p.descripcion ?? "";
+  const infoType=String(p.dalsiInfoTyp||"").toLowerCase();
+  $("infoStock").checked=infoType==="skladem";
+  $("infoImport").checked=infoType==="import";
+  $("infoStockText").value=(p.dalsiInfoSkladem ?? DEFAULT_INFO_STOCK);
+  $("infoImportText").value=(p.dalsiInfoImport ?? DEFAULT_INFO_IMPORT);
   $("mainImage").value="";
   $("gallery").value=""; galleryPreviewItems=[]; renderGalleryPreview();
   $("mainPreview").innerHTML=p.imagen?`<img class="thumb" src="${p.imagen}">`:"";
@@ -172,6 +182,13 @@ async function uploadImage(file, slug){
   return api("/api/admin/images",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug,filename:`${safe}-${Date.now()}.${ext}`,content})});
 }
 
+$("infoStock")?.addEventListener("change",e=>{
+  if(e.target.checked) $("infoImport").checked=false;
+});
+$("infoImport")?.addEventListener("change",e=>{
+  if(e.target.checked) $("infoStock").checked=false;
+});
+
 $("productForm").addEventListener("submit",async e=>{
   e.preventDefault();
   updatePayload();
@@ -206,8 +223,11 @@ $("productForm").addEventListener("submit",async e=>{
       uzitecnaHmotnostKg:payload,
       stk:$("stk").value.trim(),
       vybava:[...$("equipment").querySelectorAll('input[type="checkbox"]:checked')].map(cb=>cb.value),
-      dalsi:$("additional").value.trim()
+      dalsiInfoTyp:$("infoStock").checked ? "skladem" : ($("infoImport").checked ? "import" : ""),
+      dalsiInfoSkladem:$("infoStockText").value.trim(),
+      dalsiInfoImport:$("infoImportText").value.trim()
     };
+    if(old?.dalsi !== undefined) product.dalsi=old.dalsi;
 
     if(old?.datumPridani) product.datumPridani=old.datumPridani;
     if(old?.imagen) product.imagen=old.imagen;

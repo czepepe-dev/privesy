@@ -110,7 +110,7 @@
           <ul id="p-equipment" class="equipment-list"></ul>
         </div>
         <div id="additional-section" style="display:none;">
-          <h2 style="margin-bottom:10px;">Další</h2>
+          <h2 style="margin-bottom:10px;">Další info</h2>
           <div id="p-dalsi" class="product-description"></div>
         </div>
 
@@ -279,21 +279,16 @@
         });
         equipmentSection.style.display = equipment.length ? "" : "none";
 
-        const dalsi = String(data.dalsi ?? data.descripcion ?? "").trim();
+        const infoType = String(data.dalsiInfoTyp || "").toLowerCase();
+        const dalsi = infoType === "skladem"
+          ? String(data.dalsiInfoSkladem || "").trim()
+          : infoType === "import"
+            ? String(data.dalsiInfoImport || "").trim()
+            : "";
         const additionalSection = document.getElementById("additional-section");
         const additional = document.getElementById("p-dalsi");
         additionalSection.style.display = dalsi ? "" : "none";
-        if (dalsi) {
-          try {
-            additional.innerHTML = (window.marked && typeof marked.parse === "function")
-              ? marked.parse(dalsi)
-              : dalsi.replace(/\n/g, "<br>");
-          } catch {
-            additional.textContent = dalsi;
-          }
-        } else {
-          additional.innerHTML = "";
-        }
+        additional.textContent = dalsi;
 
         buildLightboxImages(data);
         const gal = document.getElementById("galerie");

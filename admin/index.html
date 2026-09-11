@@ -30,6 +30,7 @@
     .gallery-item .gallery-pos{font-size:12px;text-align:center;margin-top:5px;color:#555}
     .gallery-item .gallery-remove{position:absolute;right:4px;top:4px;width:25px;height:25px;border:0;border-radius:50%;cursor:pointer;background:rgba(0,0,0,.7);color:#fff;font-weight:bold}
     .gallery-hint{font-size:13px;color:#666;margin-top:6px}
+    .additional-info-options{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}.additional-info-option{border:1px solid #ddd;border-radius:8px;padding:12px;background:#fafafa}.additional-info-option .check-label{display:flex;align-items:center;gap:8px;font-weight:700;margin:0 0 8px}.additional-info-option .check-label input{width:auto;margin:0}.additional-info-option textarea{min-height:130px;resize:vertical}@media(max-width:700px){.additional-info-options{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -145,7 +146,19 @@
   </div>
   <div id="equipmentStatus" class="muted" style="margin-top:6px"></div>
 </div>
-<div class="full"><label>Další</label><textarea id="additional" placeholder="Doplňující informace..."></textarea></div>
+<div class="full">
+  <label>Další info</label>
+  <div class="additional-info-options">
+    <div class="additional-info-option">
+      <label class="check-label"><input type="checkbox" id="infoStock"> <span>SKLADEM</span></label>
+      <textarea id="infoStockText" placeholder="Text pro SKLADEM">Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.</textarea>
+    </div>
+    <div class="additional-info-option">
+      <label class="check-label"><input type="checkbox" id="infoImport"> <span>IMPORT</span></label>
+      <textarea id="infoImportText" placeholder="Text pro IMPORT">Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.</textarea>
+    </div>
+  </div>
+</div>
 <div class="full"><label>Hlavní fotografie</label><input id="mainImage" type="file" accept="image/*"><div id="mainPreview"></div></div>
 <div class="full"><label>Další fotografie do galerie</label><input id="gallery" type="file" accept="image/*" multiple><div id="galleryPreview" class="gallery-preview"></div></div>
 </div>
