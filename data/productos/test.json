@@ -1,0 +1,35 @@
+{
+  "nombre": "test",
+  "precio": "78555",
+  "puvodniCena": null,
+  "categoria": "prepravniky",
+  "vyrobce": "Blomert (Německo)",
+  "rokVyroby": 2006,
+  "rokVyrobyMesic": 1,
+  "provozniHmotnostKg": 499,
+  "celkovaHmotnostKg": 2000,
+  "uzitecnaHmotnostKg": 1501,
+  "stk": "",
+  "vybava": [
+    "samostatná sedlovna",
+    "celolitá pogumovaná podlaha",
+    "odvětrací okna",
+    "boční rampa",
+    "zadní nájezdová rampa",
+    "opěrné kolečko"
+  ],
+  "dalsiInfoTyp": "skladem",
+  "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
+  "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
+  "imagen": "/img/galeria/test/Snimek-obrazovky-2026-09-11-020941-1789127895574.webp",
+  "imagenMiniatura": "/img/galeria/test/Snimek-obrazovky-2026-09-11-020941-1789127896798-thumb.webp",
+  "galeria": [
+    {
+      "imagen": "/img/galeria/test/Snimek-obrazovky-2026-09-11-011321-1789127897977.webp"
+    },
+    {
+      "imagen": "/img/galeria/test/Snimek-obrazovky-2026-09-11-011832-1789127899324.webp"
+    }
+  ],
+  "datumPridani": "2026-09-11T11:58:20.778Z"
+}
