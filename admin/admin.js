@@ -40,12 +40,37 @@ function renderEquipmentOptions(){
   const box=$("equipment");
   if(!box)return;
   const checked=new Set([...box.querySelectorAll('input[type="checkbox"]:checked')].map(cb=>cb.value));
-  box.innerHTML=equipmentOptions.map(item=>{
+  const activeKeys=new Set(equipmentOptions.map(x=>x.toLocaleLowerCase("cs-CZ")));
+  const legacy=currentProduct&&Array.isArray(currentProduct.vybava)
+    ? currentProduct.vybava.filter(x=>x&&!activeKeys.has(String(x).toLocaleLowerCase("cs-CZ")))
+    : [];
+  const all=[...equipmentOptions,...legacy];
+  box.innerHTML=all.map(item=>{
     const safe=escapeHtml(item);
-    return `<label><input type="checkbox" value="${escapeAttr(item)}"${checked.has(item)?" checked":""}> ${safe}</label>`;
+    const isLegacy=legacy.includes(item);
+    const checkedNow=isLegacy || checked.has(item);
+    return `<label class="equipment-item${isLegacy?" equipment-legacy":""}">`
+      + `<input type="checkbox" value="${escapeAttr(item)}"${checkedNow?" checked":""}>`
+      + `<span>${safe}</span>`
+      + (isLegacy ? `<span class="muted" title="Tato položka byla dříve použita u tohoto přívěsu a zůstává zachována.">(historická)</span>`
+                  : `<button type="button" class="equipment-delete" data-equipment-delete="${escapeAttr(item)}" title="Smazat ze seznamu">×</button>`)
+      + `</label>`;
   }).join("");
+  box.querySelectorAll("[data-equipment-delete]").forEach(btn=>{
+    btn.addEventListener("click", async e=>{
+      e.preventDefault(); e.stopPropagation();
+      const item=btn.dataset.equipmentDelete;
+      if(!confirm(`Opravdu odstranit položku „${item}“ ze seznamu?\n\nU přívěsů, kde už byla použita, zůstane zachována.`)) return;
+      setStatus($("equipmentStatus"),"Odstraňuji...",true);
+      try{
+        const data=await api("/api/admin/equipment",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({item})});
+        equipmentOptions=Array.isArray(data.items)?data.items.filter(Boolean):equipmentOptions;
+        renderEquipmentOptions();
+        setStatus($("equipmentStatus"),data.deleted?"Položka byla odstraněna ze seznamu. U dříve uložených přívěsů zůstává zachována.":"Položka už v seznamu není.",true);
+      }catch(err){setStatus($("equipmentStatus"),err.message);}
+    });
+  });
 }
-
 async function loadEquipment(){
   try{
     const data=await api("/api/admin/equipment");
@@ -261,7 +286,10 @@ $("productForm").addEventListener("submit",async e=>{
       celkovaHmotnostKg:total,
       uzitecnaHmotnostKg:payload,
       stk:$("stk").value.trim(),
-      vybava:[...$("equipment").querySelectorAll('input[type="checkbox"]:checked')].map(cb=>cb.value),
+      vybava:[...new Set([
+        ...((old&&Array.isArray(old.vybava)) ? old.vybava.filter(item=>!equipmentOptions.some(opt=>opt.toLocaleLowerCase("cs-CZ")===String(item).toLocaleLowerCase("cs-CZ"))) : []),
+        ...[...$("equipment").querySelectorAll('input[type="checkbox"]:checked')].map(cb=>cb.value)
+      ])],
       dalsiInfoTyp:$("infoStock").checked ? "skladem" : ($("infoImport").checked ? "import" : ""),
       dalsiInfoSkladem:$("infoStockText").value.trim(),
       dalsiInfoImport:$("infoImportText").value.trim()

@@ -7,12 +7,12 @@ let produktyCache = null;
 async function ziskejSeznamSouboru() {
   try {
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${PRODUCT_PATH}?ref=main`;
-    const resp = await fetch(url, { cache: "force-cache" });
+    const resp = await fetch(url, { cache: "no-store" });
     if (!resp.ok) return [];
     const files = await resp.json();
     return files
       .filter(f => f.type === "file" && f.name.toLowerCase().endsWith(".json"))
-      .map(f => f.name);
+      .map(f => ({ name: f.name, sha: f.sha }));
   } catch (e) {
     return [];
   }
@@ -22,12 +22,13 @@ async function nactiVsechnyProdukty() {
   if (produktyCache) return produktyCache;
 
   const seznam = await ziskejSeznamSouboru();
-  const produkty = await Promise.all(seznam.map(async file => {
+  const produkty = await Promise.all(seznam.map(async entry => {
+    const file = entry.name;
     try {
       // Všechny produkty načítáme souběžně místo jednoho po druhém.
-      // Bez ?t=Date.now() může prohlížeč/CDN odpověď efektivně cachovat.
+      // URL obsahuje SHA souboru, takže změna produktu automaticky vytvoří novou cache položku.
       const resp = await fetch(
-        `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${PRODUCT_PATH}/${encodeURIComponent(file)}`,
+        `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${PRODUCT_PATH}/${encodeURIComponent(file)}?v=${encodeURIComponent(entry.sha || "")}`,
         { cache: "force-cache" }
       );
       if (!resp.ok) throw new Error(`Nelze načíst ${file}`);
