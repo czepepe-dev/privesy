@@ -26,13 +26,16 @@
     "opěrné kolečko",
     "ochranná guma na podlaze",
     "celolaminát",
-    "hydraulický nájezdový brzdový systém"
+    "hydraulický nájezdový brzdový systém",
+    "podlaha ve 100% stavu",
+    "brzdy ve 100% stavu"
   ],
   "dalsiInfoTyp": "",
   "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
   "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
-  "imagen": "/img/galeria/2001-robustni-xl-prives-pro-2-kone-bockmann-big-master-2400kg/prives-na-kone-bockmann-big-master_na-prodej_05-1790101852798.webp",
-  "imagenMiniatura": "/img/galeria/2001-robustni-xl-prives-pro-2-kone-bockmann-big-master-2400kg/prives-na-kone-bockmann-big-master_na-prodej_05-1790101854563-thumb.webp",
+  "datumPridani": "2026-09-22T18:31:16.865Z",
+  "imagen": "/img/galeria/2001-robustni-xl-prives-pro-2-kone-bockmann-big-master-2400kg/prives-na-kone-bockmann-big-master_na-prodej_05-1790102665046.webp",
+  "imagenMiniatura": "/img/galeria/2001-robustni-xl-prives-pro-2-kone-bockmann-big-master-2400kg/prives-na-kone-bockmann-big-master_na-prodej_05-1790102667315-thumb.webp",
   "galeria": [
     {
       "imagen": "/img/galeria/2001-robustni-xl-prives-pro-2-kone-bockmann-big-master-2400kg/prives-na-kone-bockmann-big-master_na-prodej_05-1790101856319.webp"
@@ -61,6 +64,5 @@
     {
       "imagen": "/img/galeria/2001-robustni-xl-prives-pro-2-kone-bockmann-big-master-2400kg/prives-na-kone-bockmann-big-master_na-prodej_09-1790101874115.webp"
     }
-  ],
-  "datumPridani": "2026-09-22T18:31:16.865Z"
+  ]
 }
