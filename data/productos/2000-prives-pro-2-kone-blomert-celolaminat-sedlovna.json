@@ -1,8 +1,8 @@
 {
   "nombre": "2000 Přívěs pro 2 koně BLOMERT, celolaminát, sedlovna",
-  "precio": "75.000,-Kč",
-  "puvodniCena": null,
-  "categoria": "prepravniky",
+  "precio": "PRODÁNO",
+  "puvodniCena": "75.000,-Kč",
+  "categoria": "ostatni",
   "vyrobce": "Blomert (Německo)",
   "rokVyroby": 2000,
   "rokVyrobyMesic": null,
@@ -11,10 +11,10 @@
   "uzitecnaHmotnostKg": 1340,
   "stk": "09.2028",
   "vybava": [
-    "samostatná sedlovna",
-    "krmný žlab",
     "podlaha ve 100% stavu",
     "brzdy ve 100% stavu",
+    "samostatná sedlovna",
+    "krmný žlab",
     "celolitá pogumovaná podlaha",
     "zadní rampa",
     "plynové tlumiče na rampě",
@@ -30,6 +30,7 @@
   "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
   "datumPridani": "2026-09-10T18:32:32.740Z",
   "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-se-sedlovnou/blomert_06-1789065132335.webp",
+  "imagenMiniatura": "/img/galeria/celolaminatovy-prives-pro-2-kone-se-sedlovnou/blomert_06-1789065132335-thumb.webp",
   "galeria": [
     {
       "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-se-sedlovnou/blomert_06-1789065134276.webp"
@@ -61,6 +62,5 @@
     {
       "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-se-sedlovnou/blomert_13-1789065151383.webp"
     }
-  ],
-  "imagenMiniatura": "/img/galeria/celolaminatovy-prives-pro-2-kone-se-sedlovnou/blomert_06-1789065132335-thumb.webp"
+  ]
 }
