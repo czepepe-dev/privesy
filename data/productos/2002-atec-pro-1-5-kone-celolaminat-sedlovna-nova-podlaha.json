@@ -1,8 +1,8 @@
 {
   "nombre": "2002 ATEC pro 1.5 koně, celolaminát, sedlovna, nová podlaha",
-  "precio": "79.000,-Kč",
-  "puvodniCena": null,
-  "categoria": "prepravniky",
+  "precio": "PRODÁNO",
+  "puvodniCena": "79.000,-Kč",
+  "categoria": "ostatni",
   "vyrobce": "Atec XX-trail (Nizozemsko)",
   "rokVyroby": 2002,
   "rokVyrobyMesic": 7,
@@ -34,6 +34,7 @@
   "dalsiInfoTyp": "",
   "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
   "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
+  "datumPridani": "2026-09-22T19:05:10.816Z",
   "imagen": "/img/galeria/2002-atec-pro-1-5-kone-celolaminat-sedlovna-nova-podlaha/ChatGPT-Image-26-8-2026-17_13_40-1790103791767.webp",
   "imagenMiniatura": "/img/galeria/2002-atec-pro-1-5-kone-celolaminat-sedlovna-nova-podlaha/ChatGPT-Image-26-8-2026-17_13_40-1790103794031-thumb.webp",
   "galeria": [
@@ -82,6 +83,5 @@
     {
       "imagen": "/img/galeria/2002-atec-pro-1-5-kone-celolaminat-sedlovna-nova-podlaha/ChatGPT-Image-26-8-2026-17_28_43-1790103899536.webp"
     }
-  ],
-  "datumPridani": "2026-09-22T19:05:10.816Z"
+  ]
 }
