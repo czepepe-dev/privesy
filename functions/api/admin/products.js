@@ -1,4 +1,3 @@
-```javascript
 import {auth,json,gh,b64decode,b64encode,BRANCH} from "./_shared.js";
 
 const ALLOWED = new Set([
@@ -6,7 +5,6 @@ const ALLOWED = new Set([
   "nakladni-privesy",
   "ostatni"
 ]);
-
 
 /* =========================================================
    OBRÁZKY
@@ -33,6 +31,7 @@ function imagePathFromUrl(value){
 }
 
 
+
 function productImagePaths(p){
   const out=new Set();
 
@@ -57,6 +56,7 @@ function productImagePaths(p){
 }
 
 
+
 function imageDirs(paths){
   const dirs=new Set();
 
@@ -70,6 +70,7 @@ function imageDirs(paths){
 
   return dirs;
 }
+
 
 
 async function cleanupImageDirs(
@@ -125,6 +126,7 @@ async function cleanupImageDirs(
 }
 
 
+
 /* =========================================================
    NAČTENÍ PRODUKTŮ
    ========================================================= */
@@ -149,7 +151,7 @@ async function getAllProducts(env){
     try{
 
       const raw=await gh(
-        `data/productos/${encodeURIComponent(f.name)}`,
+        "data/productos/" + encodeURIComponent(f.name),
         env
       );
 
@@ -171,6 +173,7 @@ async function getAllProducts(env){
 }
 
 
+
 /* =========================================================
    ŘAZENÍ PRODUKTŮ
    ========================================================= */
@@ -184,6 +187,7 @@ function sortProducts(products){
 
     const bHasOrder =
       Number.isFinite(Number(b?.poradi));
+
 
 
     /*
@@ -202,6 +206,8 @@ function sortProducts(products){
       }
     }
 
+
+
     /*
       Pokud má ruční pořadí pouze jeden
       produkt, jde před produkt bez pořadí.
@@ -214,6 +220,7 @@ function sortProducts(products){
     if(!aHasOrder && bHasOrder){
       return 1;
     }
+
 
 
     /*
@@ -236,6 +243,7 @@ function sortProducts(products){
 
   return products;
 }
+
 
 
 /* =========================================================
@@ -274,6 +282,7 @@ export async function onRequestGet({
 }
 
 
+
 /* =========================================================
    TRVALÉ ULOŽENÍ POŘADÍ PŘÍVĚSŮ
    ========================================================= */
@@ -290,6 +299,7 @@ async function saveProductOrder(
   }
 
 
+
   /*
     Normalizace slugů.
   */
@@ -302,8 +312,10 @@ async function saveProductOrder(
       .filter(Boolean);
 
 
+
   const products=
     await getAllProducts(env);
+
 
 
   const bySlug=new Map();
@@ -317,9 +329,11 @@ async function saveProductOrder(
   }
 
 
+
   const used=new Set();
 
   let position=0;
+
 
 
   /*
@@ -344,6 +358,7 @@ async function saveProductOrder(
   }
 
 
+
   /*
     Pokud některý produkt v seznamu z adminu
     chybí, přidáme ho na konec.
@@ -364,6 +379,7 @@ async function saveProductOrder(
   }
 
 
+
   /*
     Uložení každého produktu.
   */
@@ -378,7 +394,7 @@ async function saveProductOrder(
     }
 
     const path=
-      `data/productos/${encodeURIComponent(slug)}.json`;
+      "data/productos/" + encodeURIComponent(slug) + ".json";
 
     let sha;
 
@@ -386,6 +402,7 @@ async function saveProductOrder(
       sha=
         (await gh(path,env)).sha;
     }catch{}
+
 
 
     await gh(
@@ -400,7 +417,8 @@ async function saveProductOrder(
         body:JSON.stringify({
 
           message:
-            `Změněno pořadí přívěsu ${product.nombre||slug}`,
+            "Změněno pořadí přívěsu " +
+            (product.nombre || slug),
 
           content:b64encode(
             JSON.stringify(
@@ -419,8 +437,10 @@ async function saveProductOrder(
   }
 
 
+
   return sortProducts(products);
 }
+
 
 
 /* =========================================================
@@ -443,6 +463,7 @@ export async function onRequestPost({
 
     const body=
       await request.json();
+
 
 
     /*
@@ -468,6 +489,7 @@ export async function onRequestPost({
     }
 
 
+
     /*
       Původní ukládání produktu.
     */
@@ -487,10 +509,12 @@ export async function onRequestPost({
     }
 
 
+
     const original=
       String(
         body.originalSlug||""
       ).trim();
+
 
 
     if(!p.datumPridani){
@@ -499,13 +523,16 @@ export async function onRequestPost({
     }
 
 
+
     const oldPath=
       original
-        ? `data/productos/${original}.json`
+        ? "data/productos/" + original + ".json"
         : null;
 
 
+
     let oldProduct=null;
+
 
 
     if(oldPath){
@@ -532,6 +559,7 @@ export async function onRequestPost({
     }
 
 
+
     /*
       Při úpravě existujícího produktu
       zachováme jeho ruční pořadí.
@@ -550,8 +578,9 @@ export async function onRequestPost({
     }
 
 
+
     const path=
-      `data/productos/${slug}.json`;
+      "data/productos/" + slug + ".json";
 
     let sha;
 
@@ -559,6 +588,7 @@ export async function onRequestPost({
       sha=
         (await gh(path,env)).sha;
     }catch{}
+
 
 
     await gh(
@@ -575,8 +605,8 @@ export async function onRequestPost({
           message:
             original &&
             original!==slug
-              ? `Upraven přívěs ${p.nombre}`
-              : `Přidán přívěs ${p.nombre}`,
+              ? "Upraven přívěs " + p.nombre
+              : "Přidán přívěs " + p.nombre,
 
           content:b64encode(
             JSON.stringify(
@@ -592,6 +622,7 @@ export async function onRequestPost({
         })
       }
     );
+
 
 
     /*
@@ -624,7 +655,7 @@ export async function onRequestPost({
             },
             body:JSON.stringify({
               message:
-                `Přejmenován přívěs ${p.nombre}`,
+                "Přejmenován přívěs " + p.nombre,
               sha:old.sha,
               branch:BRANCH
             })
@@ -633,6 +664,7 @@ export async function onRequestPost({
 
       }catch{}
     }
+
 
 
     /*
@@ -675,6 +707,7 @@ export async function onRequestPost({
     }
 
 
+
     return json({
       ok:true,
       message:
@@ -688,4 +721,3 @@ export async function onRequestPost({
     },500);
   }
 }
-```
