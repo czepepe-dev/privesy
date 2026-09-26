@@ -249,7 +249,7 @@ export async function onRequestPost({request,env}){
       env,
       items,
       current.sha,
-      `Přidána výbava/stav: ${item}`
+      "Přidána výbava/stav: " + item
     );
 
     return json({
