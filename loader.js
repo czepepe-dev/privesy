@@ -46,24 +46,17 @@ produktyCache = produkty.filter(Boolean).sort((a, b) => {
   const aPoradi = Number(a.poradi);
   const bPoradi = Number(b.poradi);
 
-  const aMaPoradi =
-    a.poradi !== null &&
-    a.poradi !== undefined &&
-    String(a.poradi).trim() !== "" &&
-    Number.isFinite(aPoradi);
+  const aMaPoradi = Number.isFinite(aPoradi);
+  const bMaPoradi = Number.isFinite(bPoradi);
 
-  const bMaPoradi =
-    b.poradi !== null &&
-    b.poradi !== undefined &&
-    String(b.poradi).trim() !== "" &&
-    Number.isFinite(bPoradi);
-
-  // Ruční pořadí z administrace má přednost.
+  // Pokud mají oba produkty ruční pořadí,
+  // použije se pořadí uložené v JSON.
   if (aMaPoradi && bMaPoradi) {
     return aPoradi - bPoradi;
   }
 
-  // Produkt s uloženým pořadím jde před produkt bez pořadí.
+  // Produkt s ručním pořadím má přednost
+  // před produktem bez pořadí.
   if (aMaPoradi && !bMaPoradi) return -1;
   if (!aMaPoradi && bMaPoradi) return 1;
 
