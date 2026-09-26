@@ -1,3 +1,5 @@
+console.log("NOVÝ ADMIN.JS – TEST"); 
+
 const $ = id => document.getElementById(id);
 let currentProduct = null;
 let equipmentOptions = [];
