@@ -11,20 +11,25 @@
   "uzitecnaHmotnostKg": 1121,
   "stk": "",
   "vybava": [
+    "stupačka",
+    "přepravník na 2 koně",
+    "celolaminát",
     "podlaha ve 100% stavu",
     "brzdy ve 100% stavu",
-    "zadní rampa",
-    "plynové tlumiče na rampě",
-    "protiskluzová guma na rampě",
+    "ochranná guma na podlaze",
     "gumové boční okopy",
-    "nové pneumatiky",
     "odvětrací okna",
     "vnitřní osvětlení",
-    "blatníky pozink",
     "samonavíjecí zadní roletka",
-    "stupačka"
+    "opěrné kolečko",
+    "zadní rampa",
+    "protiskluzová guma na rampě",
+    "plynové tlumiče na rampě",
+    "stupačka na rampě",
+    "nové pneumatiky",
+    "blatníky pozink"
   ],
-  "dalsiInfoTyp": "import",
+  "dalsiInfoTyp": "skladem",
   "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
   "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
   "datumPridani": "2026-09-11T00:37:13.942Z",
@@ -62,6 +67,5 @@
       "imagen": "/img/galeria/celolaminatovy-prives-pro-2-kone-henra-contessa/ChatGPT-Image-11-9-2026-00_58_40-1789087029014.webp"
     }
   ],
-  "slug": "2001-celolaminatovy-prives-pro-2-kone-henra-contessa",
   "poradi": 3
 }
