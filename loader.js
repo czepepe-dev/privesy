@@ -42,12 +42,29 @@ async function nactiVsechnyProdukty() {
     }
   }));
 
-  produktyCache = produkty.filter(Boolean).sort((a, b) => {
-    const ta = Date.parse(a.datumPridani || "") || 0;
-    const tb = Date.parse(b.datumPridani || "") || 0;
-    if (tb !== ta) return tb - ta;
-    return String(b.slug || "").localeCompare(String(a.slug || ""));
-  });
+produktyCache = produkty.filter(Boolean).sort((a, b) => {
+  const aHasOrder = Number.isFinite(Number(a?.poradi));
+  const bHasOrder = Number.isFinite(Number(b?.poradi));
+
+  // Ruční pořadí z administrace má přednost.
+  if (aHasOrder && bHasOrder) {
+    const diff = Number(a.poradi) - Number(b.poradi);
+    if (diff !== 0) return diff;
+  }
+
+  // Produkt s uloženým pořadím jde před produkt bez pořadí.
+  if (aHasOrder && !bHasOrder) return -1;
+  if (!aHasOrder && bHasOrder) return 1;
+
+  // U produktů bez ručního pořadí zůstává původní
+  // řazení podle data přidání – nejnovější první.
+  const ta = Date.parse(a.datumPridani || "") || 0;
+  const tb = Date.parse(b.datumPridani || "") || 0;
+
+  if (tb !== ta) return tb - ta;
+
+  return String(b.slug || "").localeCompare(String(a.slug || ""));
+});
 
   return produktyCache;
 }
