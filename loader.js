@@ -43,21 +43,32 @@ async function nactiVsechnyProdukty() {
   }));
 
 produktyCache = produkty.filter(Boolean).sort((a, b) => {
-  const aHasOrder = Number.isFinite(Number(a?.poradi));
-  const bHasOrder = Number.isFinite(Number(b?.poradi));
+  const aPoradi = Number(a.poradi);
+  const bPoradi = Number(b.poradi);
+
+  const aMaPoradi =
+    a.poradi !== null &&
+    a.poradi !== undefined &&
+    String(a.poradi).trim() !== "" &&
+    Number.isFinite(aPoradi);
+
+  const bMaPoradi =
+    b.poradi !== null &&
+    b.poradi !== undefined &&
+    String(b.poradi).trim() !== "" &&
+    Number.isFinite(bPoradi);
 
   // Ruční pořadí z administrace má přednost.
-  if (aHasOrder && bHasOrder) {
-    const diff = Number(a.poradi) - Number(b.poradi);
-    if (diff !== 0) return diff;
+  if (aMaPoradi && bMaPoradi) {
+    return aPoradi - bPoradi;
   }
 
   // Produkt s uloženým pořadím jde před produkt bez pořadí.
-  if (aHasOrder && !bHasOrder) return -1;
-  if (!aHasOrder && bHasOrder) return 1;
+  if (aMaPoradi && !bMaPoradi) return -1;
+  if (!aMaPoradi && bMaPoradi) return 1;
 
-  // U produktů bez ručního pořadí zůstává původní
-  // řazení podle data přidání – nejnovější první.
+  // Záloha pro produkty bez ručního pořadí:
+  // nejnovější produkt první.
   const ta = Date.parse(a.datumPridani || "") || 0;
   const tb = Date.parse(b.datumPridani || "") || 0;
 
