@@ -189,7 +189,7 @@ function renderEquipmentOptions(){
     const isLegacy=legacy.includes(item);
     const checkedNow=isLegacy || checked.has(item);
 
-    return `<label class="equipment-item${isLegacy?" equipment-legacy":""}">`
+return `<label class="equipment-item${isLegacy?" equipment-legacy":""}"><span class="drag-handle" title="Přetáhni pro změnu pořadí">☷</span>`
       + `<input type="checkbox" value="${escapeAttr(item)}"${checkedNow?" checked":""}>`
       + `<span>${safe}</span>`
       + (
