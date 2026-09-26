@@ -5,7 +5,7 @@ import {
   b64decode,
   b64encode,
   BRANCH
-} from "../../_shared.js";
+} from "../_shared.js";
 
 
 const PATH = "data/vybava.json";
