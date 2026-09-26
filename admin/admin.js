@@ -1,290 +1,610 @@
-console.log("NOVÝ ADMIN.JS – TEST"); 
+console.log("NOVÝ ADMIN.JS – GALERIE OPRAVENA");
 
 const $ = id => document.getElementById(id);
+
 let currentProduct = null;
 let equipmentOptions = [];
-const DEFAULT_INFO_STOCK = "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.";
-const DEFAULT_INFO_IMPORT = "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.";
 
-async function api(url, options={}) {
-  const r = await fetch(url, {credentials:"same-origin", ...options});
+let galleryPreviewItems = [];
+let galleryDragIndex = null;
+
+const DEFAULT_INFO_STOCK =
+  "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.";
+
+const DEFAULT_INFO_IMPORT =
+  "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.";
+
+
+/* =========================================================
+   API
+   ========================================================= */
+
+async function api(url, options = {}) {
+
+  const r = await fetch(
+    url,
+    {
+      credentials: "same-origin",
+      ...options
+    }
+  );
+
   let data = {};
-  try { data = await r.json(); } catch {}
-  if (r.status === 401) { showLogin(); throw new Error("Nepřihlášen."); }
-  if (!r.ok) throw new Error(data.error || "Chyba serveru.");
+
+  try {
+    data = await r.json();
+  } catch {}
+
+  if (r.status === 401) {
+    showLogin();
+    throw new Error("Nepřihlášen.");
+  }
+
+  if (!r.ok) {
+    throw new Error(
+      data.error || "Chyba serveru."
+    );
+  }
+
   return data;
 }
 
-function showLogin(){
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+function showLogin() {
+
   $("login").classList.remove("hidden");
   $("app").classList.add("hidden");
 }
 
-async function showApp(){
+
+async function showApp() {
+
   $("login").classList.add("hidden");
   $("app").classList.remove("hidden");
+
   await loadEquipment();
-  loadProducts();
+  await loadProducts();
 }
 
-function slugify(s){
-  return s.normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"")
+
+function setStatus(el, msg, ok = false) {
+
+  if (!el) return;
+
+  el.textContent = msg;
+  el.style.color =
+    ok ? "#176b3a" : "#b42318";
+}
+
+
+/* =========================================================
+   ZÁKLADNÍ FUNKCE
+   ========================================================= */
+
+function slugify(s) {
+
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g,"-")
-    .replace(/^-|-$/g,"")
-    .slice(0,80);
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
 }
 
-function setStatus(el,msg,ok=false){
-  el.textContent=msg;
-  el.style.color=ok?"#176b3a":"#b42318";
+
+function escapeHtml(s) {
+
+  return String(s).replace(
+    /[&<>"']/g,
+    m => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[m])
+  );
 }
 
-$("loginForm").addEventListener("submit", async e=>{
-  e.preventDefault();
-  setStatus($("loginStatus"),"Přihlašuji...",true);
-  try {
-    await api("/api/admin/login",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password:$("password").value})
-    });
-    $("password").value="";
-    showApp();
-  } catch(err){
-    setStatus($("loginStatus"),err.message);
+
+function escapeAttr(s) {
+  return escapeHtml(s);
+}
+
+
+/* =========================================================
+   LOGIN FORM
+   ========================================================= */
+
+$("loginForm").addEventListener(
+  "submit",
+  async e => {
+
+    e.preventDefault();
+
+    setStatus(
+      $("loginStatus"),
+      "Přihlašuji...",
+      true
+    );
+
+    try {
+
+      await api(
+        "/api/admin/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            password: $("password").value
+          })
+        }
+      );
+
+      $("password").value = "";
+
+      await showApp();
+
+    } catch (err) {
+
+      setStatus(
+        $("loginStatus"),
+        err.message
+      );
+    }
   }
-});
+);
 
-$("logoutBtn").onclick=async()=>{
-  await api("/api/admin/logout",{method:"POST"});
+
+$("logoutBtn").onclick = async () => {
+
+  await api(
+    "/api/admin/logout",
+    {
+      method: "POST"
+    }
+  );
+
   showLogin();
 };
 
-$("newBtn").onclick=resetForm;
-$("cancelBtn").onclick=resetForm;
+
+$("newBtn").onclick = resetForm;
+$("cancelBtn").onclick = resetForm;
 
 
 /* =========================================================
    VÝBAVA A STAV
    ========================================================= */
 
-function setupEquipmentDrag(){
-  const box=$("equipment");
-  if(!box)return;
+function getEquipmentValues() {
 
-  box.querySelectorAll(".equipment-item").forEach(item=>{
-    if(item.dataset.dragReady==="1")return;
+  return [
+    ...document.querySelectorAll(
+      '#equipment input[type="checkbox"]:checked'
+    )
+  ].map(x => x.value);
+}
 
-    item.dataset.dragReady="1";
-    item.draggable=true;
 
-    item.addEventListener("dragstart",e=>{
-      item.classList.add("dragging");
-      e.dataTransfer.effectAllowed="move";
-    });
+function setupEquipmentDrag() {
 
-    item.addEventListener("dragover",e=>{
-      e.preventDefault();
-      item.classList.add("drag-over");
-      e.dataTransfer.dropEffect="move";
-    });
+  const box = $("equipment");
 
-    item.addEventListener("dragleave",()=>{
-      item.classList.remove("drag-over");
-    });
+  if (!box) return;
 
-    item.addEventListener("drop",async e=>{
-      e.preventDefault();
+  box
+    .querySelectorAll(".equipment-item")
+    .forEach(item => {
 
-      const source=box.querySelector(".equipment-item.dragging");
-
-      if(!source || source===item){
-        item.classList.remove("drag-over");
+      if (item.dataset.dragReady === "1") {
         return;
       }
 
-      const r=item.getBoundingClientRect();
+      item.dataset.dragReady = "1";
+      item.draggable = true;
 
-      if(e.clientY > r.top + r.height/2){
-        box.insertBefore(source,item.nextSibling);
-      }else{
-        box.insertBefore(source,item);
-      }
+      item.addEventListener(
+        "dragstart",
+        e => {
 
-      box.querySelectorAll(".dragging,.drag-over").forEach(x=>{
-        x.classList.remove("dragging","drag-over");
-      });
+          item.classList.add("dragging");
 
-      const order=[...box.querySelectorAll(".equipment-item input")]
-        .map(x=>x.value)
-        .filter(Boolean);
-
-      try{
-        setStatus(
-          $("equipmentStatus"),
-          "Ukládám nové pořadí...",
-          true
-        );
-
-        const data=await api("/api/admin/equipment",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({items:order})
-        });
-
-        equipmentOptions=
-          Array.isArray(data.items)
-            ? data.items.filter(Boolean)
-            : equipmentOptions;
-
-        renderEquipmentOptions();
-
-        setStatus(
-          $("equipmentStatus"),
-          "Pořadí výbavy a stavu bylo uloženo.",
-          true
-        );
-
-      }catch(err){
-        setStatus($("equipmentStatus"),err.message);
-        renderEquipmentOptions();
-      }
-    });
-
-    item.addEventListener("dragend",()=>{
-      item.classList.remove("dragging");
-      item.classList.remove("drag-over");
-      box.querySelectorAll(".drag-over").forEach(x=>{
-        x.classList.remove("drag-over");
-      });
-    });
-  });
-}
-
-
-function renderEquipmentOptions(){
-  const box=$("equipment");
-  if(!box)return;
-
-  const checked=new Set(
-    [...box.querySelectorAll('input[type="checkbox"]:checked')]
-      .map(cb=>cb.value)
-  );
-
-  const activeKeys=new Set(
-    equipmentOptions.map(x=>x.toLocaleLowerCase("cs-CZ"))
-  );
-
-  const legacy=currentProduct&&Array.isArray(currentProduct.vybava)
-    ? currentProduct.vybava.filter(
-        x=>x &&
-        !activeKeys.has(String(x).toLocaleLowerCase("cs-CZ"))
-      )
-    : [];
-
-  const all=[...equipmentOptions,...legacy];
-
-  box.innerHTML=all.map(item=>{
-    const safe=escapeHtml(item);
-    const isLegacy=legacy.includes(item);
-    const checkedNow=isLegacy || checked.has(item);
-
-return `<label class="equipment-item${isLegacy?" equipment-legacy":""}"><span class="drag-handle" title="Přetáhni pro změnu pořadí">☷</span>`
-      + `<input type="checkbox" value="${escapeAttr(item)}"${checkedNow?" checked":""}>`
-      + `<span>${safe}</span>`
-      + (
-          isLegacy
-            ? `<span class="muted" title="Tato položka byla dříve použita u tohoto přívěsu a zůstává zachována.">(historická)</span>`
-            : `<button type="button" class="equipment-delete" data-equipment-delete="${escapeAttr(item)}" title="Smazat ze seznamu">×</button>`
-        )
-      + `</label>`;
-  }).join("");
-
-  /*
-   * Aktivujeme přetahování až po vytvoření položek.
-   */
-  setupEquipmentDrag();
-
-  box.querySelectorAll("[data-equipment-delete]").forEach(btn=>{
-    btn.addEventListener("click", async e=>{
-      e.preventDefault();
-      e.stopPropagation();
-
-      const item=btn.dataset.equipmentDelete;
-
-      if(!confirm(
-        `Opravdu odstranit položku „${item}“ ze seznamu?\n\n` +
-        `U přívěsů, kde už byla použita, zůstane zachována.`
-      )) return;
-
-      setStatus(
-        $("equipmentStatus"),
-        "Odstraňuji...",
-        true
+          e.dataTransfer.effectAllowed =
+            "move";
+        }
       );
 
-      try{
-        const data=await api("/api/admin/equipment",{
-          method:"DELETE",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({item})
-        });
+      item.addEventListener(
+        "dragover",
+        e => {
 
-        equipmentOptions=
-          Array.isArray(data.items)
-            ? data.items.filter(Boolean)
-            : equipmentOptions;
+          e.preventDefault();
 
-        renderEquipmentOptions();
+          item.classList.add(
+            "drag-over"
+          );
 
-        setStatus(
-          $("equipmentStatus"),
-          data.deleted
-            ? "Položka byla odstraněna ze seznamu. U dříve uložených přívěsů zůstává zachována."
-            : "Položka už v seznamu není.",
-          true
-        );
+          e.dataTransfer.dropEffect =
+            "move";
+        }
+      );
 
-      }catch(err){
-        setStatus($("equipmentStatus"),err.message);
-      }
+      item.addEventListener(
+        "dragleave",
+        () => {
+
+          item.classList.remove(
+            "drag-over"
+          );
+        }
+      );
+
+      item.addEventListener(
+        "drop",
+        async e => {
+
+          e.preventDefault();
+
+          const source =
+            box.querySelector(
+              ".equipment-item.dragging"
+            );
+
+          if (!source || source === item) {
+            item.classList.remove(
+              "drag-over"
+            );
+            return;
+          }
+
+          const r =
+            item.getBoundingClientRect();
+
+          if (
+            e.clientY >
+            r.top + r.height / 2
+          ) {
+
+            box.insertBefore(
+              source,
+              item.nextSibling
+            );
+
+          } else {
+
+            box.insertBefore(
+              source,
+              item
+            );
+          }
+
+          box
+            .querySelectorAll(
+              ".dragging,.drag-over"
+            )
+            .forEach(x => {
+
+              x.classList.remove(
+                "dragging",
+                "drag-over"
+              );
+            });
+
+          const order = [
+            ...box.querySelectorAll(
+              ".equipment-item input"
+            )
+          ]
+            .map(x => x.value)
+            .filter(Boolean);
+
+          try {
+
+            setStatus(
+              $("equipmentStatus"),
+              "Ukládám nové pořadí...",
+              true
+            );
+
+            const data =
+              await api(
+                "/api/admin/equipment",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+                  body: JSON.stringify({
+                    items: order
+                  })
+                }
+              );
+
+            equipmentOptions =
+              Array.isArray(data.items)
+                ? data.items.filter(Boolean)
+                : equipmentOptions;
+
+            renderEquipmentOptions();
+
+            setStatus(
+              $("equipmentStatus"),
+              "Pořadí výbavy a stavu bylo uloženo.",
+              true
+            );
+
+          } catch (err) {
+
+            setStatus(
+              $("equipmentStatus"),
+              err.message
+            );
+
+            renderEquipmentOptions();
+          }
+        }
+      );
+
+      item.addEventListener(
+        "dragend",
+        () => {
+
+          item.classList.remove(
+            "dragging",
+            "drag-over"
+          );
+
+          box
+            .querySelectorAll(
+              ".drag-over"
+            )
+            .forEach(x => {
+
+              x.classList.remove(
+                "drag-over"
+              );
+            });
+        }
+      );
     });
-  });
 }
 
 
-async function loadEquipment(){
-  try{
-    const data=await api("/api/admin/equipment");
+function renderEquipmentOptions() {
 
-    equipmentOptions=
+  const box = $("equipment");
+
+  if (!box) return;
+
+  const checked =
+    new Set(
+      [
+        ...box.querySelectorAll(
+          'input[type="checkbox"]:checked'
+        )
+      ].map(cb => cb.value)
+    );
+
+  const activeKeys =
+    new Set(
+      equipmentOptions.map(
+        x =>
+          x.toLocaleLowerCase("cs-CZ")
+      )
+    );
+
+  const legacy =
+    currentProduct &&
+    Array.isArray(currentProduct.vybava)
+      ? currentProduct.vybava.filter(
+          x =>
+            x &&
+            !activeKeys.has(
+              String(x)
+                .toLocaleLowerCase("cs-CZ")
+            )
+        )
+      : [];
+
+  const all = [
+    ...equipmentOptions,
+    ...legacy
+  ];
+
+  box.innerHTML =
+    all
+      .map(item => {
+
+        const safe =
+          escapeHtml(item);
+
+        const isLegacy =
+          legacy.includes(item);
+
+        const checkedNow =
+          isLegacy ||
+          checked.has(item);
+
+        return `
+          <label
+            class="equipment-item${
+              isLegacy
+                ? " equipment-legacy"
+                : ""
+            }"
+          >
+
+            <span
+              class="drag-handle"
+              title="Přetáhni pro změnu pořadí"
+            >☷</span>
+
+            <input
+              type="checkbox"
+              value="${escapeAttr(item)}"
+              ${checkedNow ? "checked" : ""}
+            >
+
+            <span>${safe}</span>
+
+            ${
+              isLegacy
+                ? `
+                  <span
+                    class="muted"
+                    title="Tato položka byla dříve použita u tohoto přívěsu a zůstává zachována."
+                  >
+                    (historická)
+                  </span>
+                `
+                : `
+                  <button
+                    type="button"
+                    class="equipment-delete"
+                    data-equipment-delete="${escapeAttr(item)}"
+                    title="Smazat ze seznamu"
+                  >
+                    ×
+                  </button>
+                `
+            }
+
+          </label>
+        `;
+      })
+      .join("");
+
+  setupEquipmentDrag();
+
+  box
+    .querySelectorAll(
+      "[data-equipment-delete]"
+    )
+    .forEach(btn => {
+
+      btn.addEventListener(
+        "click",
+        async e => {
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          const item =
+            btn.dataset.equipmentDelete;
+
+          if (
+            !confirm(
+              `Opravdu odstranit položku „${item}“ ze seznamu?\n\n` +
+              `U přívěsů, kde už byla použita, zůstane zachována.`
+            )
+          ) {
+            return;
+          }
+
+          setStatus(
+            $("equipmentStatus"),
+            "Odstraňuji...",
+            true
+          );
+
+          try {
+
+            const data =
+              await api(
+                "/api/admin/equipment",
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+                  body: JSON.stringify({
+                    item
+                  })
+                }
+              );
+
+            equipmentOptions =
+              Array.isArray(data.items)
+                ? data.items.filter(Boolean)
+                : equipmentOptions;
+
+            renderEquipmentOptions();
+
+            setStatus(
+              $("equipmentStatus"),
+              data.deleted
+                ? "Položka byla odstraněna ze seznamu. U dříve uložených přívěsů zůstává zachována."
+                : "Položka už v seznamu není.",
+              true
+            );
+
+          } catch (err) {
+
+            setStatus(
+              $("equipmentStatus"),
+              err.message
+            );
+          }
+        }
+      );
+    });
+}
+
+
+async function loadEquipment() {
+
+  try {
+
+    const data =
+      await api(
+        "/api/admin/equipment"
+      );
+
+    equipmentOptions =
       Array.isArray(data.items)
         ? data.items.filter(Boolean)
         : [];
 
     renderEquipmentOptions();
 
-    $("equipmentStatus").textContent="";
+    $("equipmentStatus").textContent = "";
 
-  }catch(err){
-    $("equipmentStatus").textContent=
-      "Seznam výbavy se nepodařilo načíst: "+err.message;
+  } catch (err) {
+
+    $("equipmentStatus").textContent =
+      "Seznam výbavy se nepodařilo načíst: " +
+      err.message;
   }
 }
 
 
-async function addEquipmentOption(){
-  const input=$("customEquipment");
-  const value=input.value.trim();
+async function addEquipmentOption() {
 
-  if(!value){
+  const input =
+    $("customEquipment");
+
+  const value =
+    input.value.trim();
+
+  if (!value) {
+
     setStatus(
       $("equipmentStatus"),
       "Napiš nejdříve název nové výbavy nebo stavu."
     );
+
     input.focus();
+
     return;
   }
 
@@ -294,27 +614,46 @@ async function addEquipmentOption(){
     true
   );
 
-  try{
-    const data=await api("/api/admin/equipment",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({item:value})
-    });
+  try {
 
-    equipmentOptions=
+    const data =
+      await api(
+        "/api/admin/equipment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            item: value
+          })
+        }
+      );
+
+    equipmentOptions =
       Array.isArray(data.items)
         ? data.items.filter(Boolean)
         : equipmentOptions;
 
     renderEquipmentOptions();
 
-    const cb=[
-      ...$("equipment").querySelectorAll('input[type="checkbox"]')
-    ].find(x=>x.value===data.item);
+    const cb =
+      [
+        ...$("equipment")
+          .querySelectorAll(
+            'input[type="checkbox"]'
+          )
+      ]
+        .find(
+          x => x.value === data.item
+        );
 
-    if(cb)cb.checked=true;
+    if (cb) {
+      cb.checked = true;
+    }
 
-    input.value="";
+    input.value = "";
 
     setStatus(
       $("equipmentStatus"),
@@ -326,8 +665,12 @@ async function addEquipmentOption(){
 
     input.focus();
 
-  }catch(err){
-    setStatus($("equipmentStatus"),err.message);
+  } catch (err) {
+
+    setStatus(
+      $("equipmentStatus"),
+      err.message
+    );
   }
 }
 
@@ -337,141 +680,55 @@ $("addEquipmentBtn")?.addEventListener(
   addEquipmentOption
 );
 
-$("customEquipment")?.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    addEquipmentOption();
+
+$("customEquipment")?.addEventListener(
+  "keydown",
+  e => {
+
+    if (e.key === "Enter") {
+
+      e.preventDefault();
+
+      addEquipmentOption();
+    }
   }
-});
+);
 
 
 /* =========================================================
-   FORMULÁŘ
+   HMOTNOST
    ========================================================= */
 
-function resetForm(){
-  currentProduct=null;
+function updatePayload() {
 
-  $("productForm").reset();
-  $("manufacturerSelect").value="";
-  $("manufacturerCustom").value="";
-  $("originalSlug").value="";
+  const total =
+    Number(
+      $("totalWeight").value
+    );
 
-  $("formTitle").textContent="Nový přívěs";
+  const operating =
+    Number(
+      $("weight").value
+    );
 
-  $("mainPreview").innerHTML="";
-  $("galleryPreview").innerHTML="";
-  $("saveStatus").textContent="";
-  $("customEquipment").value="";
-  $("equipmentStatus").textContent="";
-
-  $("infoStock").checked=false;
-  $("infoImport").checked=false;
-
-  $("infoStockText").value=DEFAULT_INFO_STOCK;
-  $("infoImportText").value=DEFAULT_INFO_IMPORT;
-
-  renderEquipmentOptions();
-  updatePayload();
-}
-
-
-function fillForm(p){
-  currentProduct=p;
-
-  $("originalSlug").value=p.slug||"";
-  $("formTitle").textContent="Upravit přívěs";
-
-  $("name").value=p.nombre||"";
-
-  $("price").value=
-    (p.categoria==="ostatni" && p.puvodniCena)
-      ? p.puvodniCena
-      : (p.precio||"");
-
-  $("category").value=p.categoria||"ostatni";
-
-  const maker=p.vyrobce||"";
-
-  const makerOption=[
-    ...$("manufacturerSelect").options
-  ].find(o=>o.value===maker);
-
-  $("manufacturerSelect").value=makerOption?maker:"";
-  $("manufacturerCustom").value=makerOption?"":maker;
-
-  $("year").value=p.rokVyroby||"";
-  $("month").value=p.rokVyrobyMesic||"";
-
-  $("weight").value=p.provozniHmotnostKg??"";
-  $("totalWeight").value=p.celkovaHmotnostKg??"";
-
-  updatePayload();
-
-  $("stk").value=p.stk||"";
-
-  renderEquipmentOptions();
-
-  $("equipment")
-    .querySelectorAll('input[type="checkbox"]')
-    .forEach(cb=>{
-      cb.checked=
-        Array.isArray(p.vybava) &&
-        p.vybava.includes(cb.value);
-    });
-
-  const infoType=String(p.dalsiInfoTyp||"").toLowerCase();
-
-  $("infoStock").checked=infoType==="skladem";
-  $("infoImport").checked=infoType==="import";
-
-  $("infoStockText").value=
-    (p.dalsiInfoSkladem ?? DEFAULT_INFO_STOCK);
-
-  $("infoImportText").value=
-    (p.dalsiInfoImport ?? DEFAULT_INFO_IMPORT);
-
-  $("mainImage").value="";
-  $("gallery").value="";
-
-  galleryPreviewItems=[];
-  renderGalleryPreview();
-
-  $("mainPreview").innerHTML=
-    p.imagen
-      ? `<img class="thumb" src="${p.imagen}">`
-      : "";
-
-  $("galleryPreview").innerHTML=
-    (p.galeria||[])
-      .map(x=>`<img class="thumb" src="${x.imagen}">`)
-      .join("");
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-}
-
-
-function updatePayload(){
-  const total=Number($("totalWeight").value);
-  const operating=Number($("weight").value);
-
-  if(
+  if (
     Number.isFinite(total) &&
     Number.isFinite(operating) &&
-    $("totalWeight").value!=="" &&
-    $("weight").value!==""
-  ){
-    const payload=total-operating;
+    $("totalWeight").value !== "" &&
+    $("weight").value !== ""
+  ) {
 
-    $("payload").value=
-      payload>=0
+    const payload =
+      total - operating;
+
+    $("payload").value =
+      payload >= 0
         ? payload
         : "";
-  }else{
-    $("payload").value="";
+
+  } else {
+
+    $("payload").value = "";
   }
 }
 
@@ -481,6 +738,7 @@ $("weight").addEventListener(
   updatePayload
 );
 
+
 $("totalWeight").addEventListener(
   "input",
   updatePayload
@@ -488,332 +746,795 @@ $("totalWeight").addEventListener(
 
 
 /* =========================================================
-   ŘAZENÍ PŘÍVĚSŮ
+   FORMULÁŘ – NOVÝ PŘÍVĚS
    ========================================================= */
 
-async function saveProductOrder(order){
-  setStatus(
-    $("saveStatus"),
-    "Ukládám nové pořadí přívěsů...",
-    true
-  );
+function resetForm() {
 
-  const data=await api(
-    "/api/admin/products",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({order})
-    }
-  );
+  currentProduct = null;
 
-  setStatus(
-    $("saveStatus"),
-    data.message || "Pořadí přívěsů bylo uloženo.",
-    true
-  );
+  $("productForm").reset();
+
+  $("manufacturerSelect").value = "";
+  $("manufacturerCustom").value = "";
+  $("originalSlug").value = "";
+
+  $("formTitle").textContent =
+    "Nový přívěs";
+
+  $("mainPreview").innerHTML = "";
+
+  clearGalleryPreview();
+
+  $("saveStatus").textContent = "";
+
+  $("customEquipment").value = "";
+  $("equipmentStatus").textContent = "";
+
+  $("infoStock").checked = false;
+  $("infoImport").checked = false;
+
+  $("infoStockText").value =
+    DEFAULT_INFO_STOCK;
+
+  $("infoImportText").value =
+    DEFAULT_INFO_IMPORT;
+
+  renderEquipmentOptions();
+
+  updatePayload();
 }
 
 
-function setupProductDrag(){
-  const box=$("products");
-  if(!box)return;
+/* =========================================================
+   FORMULÁŘ – EDITACE
+   ========================================================= */
 
-  box.querySelectorAll(".product").forEach(item=>{
-    if(item.dataset.dragReady==="1")return;
+function fillForm(p) {
 
-    item.dataset.dragReady="1";
-    item.draggable=true;
+  currentProduct = p;
 
-    item.addEventListener("dragstart",e=>{
-      if(e.target.closest("button")){
-        e.preventDefault();
-        return;
-      }
+  $("originalSlug").value =
+    p.slug || "";
 
-      item.classList.add("dragging");
-      e.dataTransfer.effectAllowed="move";
-    });
+  $("formTitle").textContent =
+    "Upravit přívěs";
 
-    item.addEventListener("dragover",e=>{
-      e.preventDefault();
+  $("name").value =
+    p.nombre || "";
 
-      item.classList.add("drag-over");
-      e.dataTransfer.dropEffect="move";
-    });
-
-    item.addEventListener("dragleave",()=>{
-      item.classList.remove("drag-over");
-    });
-
-    item.addEventListener("drop",async e=>{
-      e.preventDefault();
-
-      const source=
-        box.querySelector(".product.dragging");
-
-      if(!source || source===item){
-        item.classList.remove("drag-over");
-        return;
-      }
-
-      const r=item.getBoundingClientRect();
-
-      if(e.clientY > r.top+r.height/2){
-        box.insertBefore(
-          source,
-          item.nextSibling
+  $("price").value =
+    (
+      p.categoria === "ostatni" &&
+      p.puvodniCena
+    )
+      ? p.puvodniCena
+      : (
+          p.precio || ""
         );
-      }else{
-        box.insertBefore(
-          source,
-          item
+
+  $("category").value =
+    p.categoria || "ostatni";
+
+  const maker =
+    p.vyrobce || "";
+
+  const makerOption =
+    [
+      ...$("manufacturerSelect").options
+    ]
+      .find(
+        o => o.value === maker
+      );
+
+  $("manufacturerSelect").value =
+    makerOption
+      ? maker
+      : "";
+
+  $("manufacturerCustom").value =
+    makerOption
+      ? ""
+      : maker;
+
+  $("year").value =
+    p.rokVyroby || "";
+
+  $("month").value =
+    p.rokVyrobyMesic || "";
+
+  $("weight").value =
+    p.provozniHmotnostKg ?? "";
+
+  $("totalWeight").value =
+    p.celkovaHmotnostKg ?? "";
+
+  updatePayload();
+
+  $("stk").value =
+    p.stk || "";
+
+  renderEquipmentOptions();
+
+  $("equipment")
+    .querySelectorAll(
+      'input[type="checkbox"]'
+    )
+    .forEach(cb => {
+
+      cb.checked =
+        Array.isArray(p.vybava) &&
+        p.vybava.includes(
+          cb.value
         );
-      }
-
-      box
-        .querySelectorAll(".dragging,.drag-over")
-        .forEach(x=>{
-          x.classList.remove("dragging","drag-over");
-        });
-
-      const order=[
-        ...box.querySelectorAll(".product")
-      ]
-        .map(x=>x.dataset.slug)
-        .filter(Boolean);
-
-      try{
-        await saveProductOrder(order);
-        await loadProducts();
-      }catch(err){
-        alert(err.message);
-        await loadProducts();
-      }
     });
 
-    item.addEventListener("dragend",()=>{
-      item.classList.remove("dragging");
-      item.classList.remove("drag-over");
+  const infoType =
+    String(
+      p.dalsiInfoTyp || ""
+    ).toLowerCase();
 
-      box
-        .querySelectorAll(".drag-over")
-        .forEach(x=>{
-          x.classList.remove("drag-over");
-        });
-    });
+  $("infoStock").checked =
+    infoType === "skladem";
+
+  $("infoImport").checked =
+    infoType === "import";
+
+  $("infoStockText").value =
+    p.dalsiInfoSkladem ??
+    DEFAULT_INFO_STOCK;
+
+  $("infoImportText").value =
+    p.dalsiInfoImport ??
+    DEFAULT_INFO_IMPORT;
+
+  $("mainImage").value = "";
+
+  $("gallery").value = "";
+
+  /*
+   * =====================================================
+   * DŮLEŽITÉ:
+   *
+   * TADY SE NAČTE CELÁ EXISTUJÍCÍ GALERIE.
+   *
+   * Dříve se pouze vypisovaly obrázky <img>, takže
+   * po editaci už nebylo možné s nimi pracovat.
+   * =====================================================
+   */
+
+  galleryPreviewItems =
+    Array.isArray(p.galeria)
+      ? p.galeria
+          .filter(
+            x =>
+              x &&
+              (
+                typeof x === "string" ||
+                x.imagen
+              )
+          )
+          .map(
+            x => {
+
+              if (
+                typeof x === "string"
+              ) {
+
+                return {
+                  url: x,
+                  file: null,
+                  existing: true
+                };
+              }
+
+              return {
+                url: x.imagen,
+                file: null,
+                existing: true
+              };
+            }
+          )
+      : [];
+
+  renderGalleryPreview();
+
+  $("mainPreview").innerHTML =
+    p.imagen
+      ? `
+        <img
+          class="thumb"
+          src="${escapeAttr(p.imagen)}"
+          alt="Hlavní fotografie"
+        >
+      `
+      : "";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
   });
 }
 
 
 /* =========================================================
-   PRODUKTY
+   HLAVNÍ FOTOGRAFIE
    ========================================================= */
 
-async function loadProducts(){
-  try{
-    const data=await api("/api/admin/products");
+function showMainPreview(file) {
 
-    $("products").innerHTML=
-      data.products.length
-        ? data.products.map(p=>`
-      <div
-        class="product"
-        draggable="true"
-        data-slug="${escapeAttr(p.slug||"")}"
-      >
-        <span
-          class="drag-handle"
-          title="Přetáhni pro změnu pořadí"
-        >☷</span>
+  const box =
+    $("mainPreview");
 
-        <img
-          src="${p.imagen||""}"
-          onerror="this.style.visibility='hidden'"
-        >
+  if (!box) return;
 
-        <div>
-          <strong>
-            ${escapeHtml(p.nombre||"Bez názvu")}
-          </strong>
+  if (!file) {
 
-          <div class="muted">
-            ${escapeHtml(p.precio||"")} ·
-            ${escapeHtml(labelCat(p.categoria))}
-            <br>
-            přidáno:
-            ${
-              p.datumPridani
-                ? new Date(p.datumPridani)
-                    .toLocaleString("cs-CZ")
-                : "neuvedeno"
-            }
-          </div>
-        </div>
+    box.innerHTML = "";
 
-        <div class="actions row">
-          <button
-            class="secondary"
-            data-edit="${escapeAttr(p.slug)}"
-          >
-            Upravit
-          </button>
-
-          <button
-            class="danger"
-            data-delete="${escapeAttr(p.slug)}"
-          >
-            Smazat
-          </button>
-        </div>
-      </div>`
-        ).join("")
-        : "<p>Žádné přívěsy.</p>";
-
-    document
-      .querySelectorAll("[data-edit]")
-      .forEach(
-        b=>b.onclick=()=>
-          fillForm(
-            data.products.find(
-              p=>p.slug===b.dataset.edit
-            )
-          )
-      );
-
-    document
-      .querySelectorAll("[data-delete]")
-      .forEach(
-        b=>b.onclick=()=>
-          deleteProduct(
-            b.dataset.delete
-          )
-      );
-
-    /*
-     * Aktivujeme přetahování až po vykreslení
-     * všech produktů.
-     */
-    setupProductDrag();
-
-  }catch(err){
-    $("products").innerHTML=
-      `<p>${escapeHtml(err.message)}</p>`;
+    return;
   }
+
+  const url =
+    URL.createObjectURL(file);
+
+  box.innerHTML =
+    `
+      <img
+        class="thumb"
+        src="${url}"
+        alt="Náhled hlavní fotografie"
+      >
+    `;
+
+  const img =
+    box.querySelector("img");
+
+  img.onload = () => {
+
+    URL.revokeObjectURL(url);
+  };
 }
 
 
-function labelCat(c){
-  return c==="prepravniky"
-    ? "Přívěsy na koně"
-    : c==="nakladni-privesy"
-      ? "Nákladní přívěsy"
-      : "Ostatní";
-}
+$("mainImage")?.addEventListener(
+  "change",
+  e => {
 
-
-function escapeHtml(s){
-  return String(s).replace(
-    /[&<>"']/g,
-    m=>({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#039;"
-    }[m])
-  );
-}
-
-
-function escapeAttr(s){
-  return escapeHtml(s);
-}
-
-
-async function deleteProduct(slug){
-  if(!confirm("Opravdu smazat tento přívěs?"))return;
-
-  try{
-    await api(
-      "/api/admin/products/"+encodeURIComponent(slug),
-      {method:"DELETE"}
+    showMainPreview(
+      e.target.files[0] || null
     );
+  }
+);
 
-    if(currentProduct?.slug===slug){
-      resetForm();
+
+/* =========================================================
+   GALERIE – VYČIŠTĚNÍ
+   ========================================================= */
+
+function clearGalleryPreview() {
+
+  galleryPreviewItems.forEach(
+    item => {
+
+      if (
+        item.url &&
+        item.url.startsWith("blob:")
+      ) {
+
+        URL.revokeObjectURL(
+          item.url
+        );
+      }
     }
+  );
 
-    loadProducts();
+  galleryPreviewItems = [];
+  galleryDragIndex = null;
 
-  }catch(err){
-    alert(err.message);
+  const box =
+    $("galleryPreview");
+
+  if (box) {
+    box.innerHTML = "";
+  }
+
+  const input =
+    $("gallery");
+
+  if (input) {
+    input.value = "";
   }
 }
 
 
 /* =========================================================
-   OBRÁZKY
+   GALERIE – SYNCHRONIZACE FILE INPUTU
+   ========================================================= */
+
+function syncGalleryInput() {
+
+  const input =
+    $("gallery");
+
+  if (!input) return;
+
+  const dt =
+    new DataTransfer();
+
+  galleryPreviewItems.forEach(
+    item => {
+
+      if (item.file) {
+
+        dt.items.add(
+          item.file
+        );
+      }
+    }
+  );
+
+  input.files =
+    dt.files;
+}
+
+
+/* =========================================================
+   GALERIE – VYKRESLENÍ
+   ========================================================= */
+
+function renderGalleryPreview() {
+
+  const box =
+    $("galleryPreview");
+
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  galleryPreviewItems.forEach(
+    (item, i) => {
+
+      const el =
+        document.createElement(
+          "div"
+        );
+
+      el.className =
+        "gallery-item";
+
+      el.draggable = true;
+
+      /*
+       * OBRAZEK
+       */
+
+      const img =
+        document.createElement(
+          "img"
+        );
+
+      img.src =
+        item.url;
+
+      img.alt =
+        "Galerie – pozice " +
+        (i + 1);
+
+      /*
+       * POZICE
+       */
+
+      const pos =
+        document.createElement(
+          "div"
+        );
+
+      pos.className =
+        "gallery-pos";
+
+      pos.textContent =
+        "Pozice " +
+        (i + 1);
+
+      /*
+       * TYP FOTOGRAFIE
+       */
+
+      const type =
+        document.createElement(
+          "div"
+        );
+
+      type.className =
+        "gallery-type";
+
+      type.style.fontSize =
+        "11px";
+
+      type.style.textAlign =
+        "center";
+
+      type.style.color =
+        "#777";
+
+      type.textContent =
+        item.existing
+          ? "uložená fotografie"
+          : "nová fotografie";
+
+      /*
+       * SMAZÁNÍ
+       */
+
+      const rm =
+        document.createElement(
+          "button"
+        );
+
+      rm.type =
+        "button";
+
+      rm.className =
+        "gallery-remove";
+
+      rm.textContent =
+        "×";
+
+      rm.title =
+        "Odstranit fotografii";
+
+      rm.onclick =
+        e => {
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          /*
+           * Pokud je to blob z nové fotografie,
+           * uvolníme jeho URL.
+           */
+
+          if (
+            item.url &&
+            item.url.startsWith(
+              "blob:"
+            )
+          ) {
+
+            URL.revokeObjectURL(
+              item.url
+            );
+          }
+
+          galleryPreviewItems.splice(
+            i,
+            1
+          );
+
+          syncGalleryInput();
+
+          renderGalleryPreview();
+        };
+
+      el.append(
+        img,
+        pos,
+        type,
+        rm
+      );
+
+      /*
+       * ==================================================
+       * DRAG & DROP
+       * ==================================================
+       */
+
+      el.ondragstart =
+        e => {
+
+          galleryDragIndex =
+            i;
+
+          el.classList.add(
+            "dragging"
+          );
+
+          e.dataTransfer.effectAllowed =
+            "move";
+
+          /*
+           * Některé prohlížeče potřebují
+           * skutečný dataTransfer obsah.
+           */
+
+          try {
+
+            e.dataTransfer.setData(
+              "text/plain",
+              String(i)
+            );
+
+          } catch {}
+        };
+
+      el.ondragend =
+        () => {
+
+          galleryDragIndex =
+            null;
+
+          el.classList.remove(
+            "dragging"
+          );
+
+          box
+            .querySelectorAll(
+              ".gallery-item"
+            )
+            .forEach(x => {
+
+              x.classList.remove(
+                "drag-over"
+              );
+            });
+        };
+
+      el.ondragover =
+        e => {
+
+          e.preventDefault();
+
+          if (
+            galleryDragIndex !== null &&
+            galleryDragIndex !== i
+          ) {
+
+            el.classList.add(
+              "drag-over"
+            );
+
+            e.dataTransfer.dropEffect =
+              "move";
+          }
+        };
+
+      el.ondragleave =
+        () => {
+
+          el.classList.remove(
+            "drag-over"
+          );
+        };
+
+      el.ondrop =
+        e => {
+
+          e.preventDefault();
+
+          el.classList.remove(
+            "drag-over"
+          );
+
+          if (
+            galleryDragIndex === null ||
+            galleryDragIndex === i
+          ) {
+
+            return;
+          }
+
+          const sourceIndex =
+            galleryDragIndex;
+
+          const source =
+            galleryPreviewItems.splice(
+              sourceIndex,
+              1
+            )[0];
+
+          /*
+           * Když se přesouvá položka
+           * z nižší pozice na vyšší,
+           * po splice se index cíle posune.
+           */
+
+          let targetIndex = i;
+
+          if (
+            sourceIndex < i
+          ) {
+
+            targetIndex--;
+          }
+
+          galleryPreviewItems.splice(
+            targetIndex,
+            0,
+            source
+          );
+
+          galleryDragIndex =
+            null;
+
+          syncGalleryInput();
+
+          renderGalleryPreview();
+        };
+
+      box.appendChild(el);
+    }
+  );
+}
+
+
+/* =========================================================
+   GALERIE – PŘIDÁNÍ NOVÝCH FOTEK
+   ========================================================= */
+
+$("gallery")?.addEventListener(
+  "change",
+  e => {
+
+    const files =
+      Array.from(
+        e.target.files || []
+      )
+        .filter(
+          f =>
+            f.type.startsWith(
+              "image/"
+            )
+        );
+
+    /*
+     * DŮLEŽITÉ:
+     *
+     * Nové fotky nepřepisují existující galerii.
+     * Přidají se na její konec.
+     */
+
+    files.forEach(
+      file => {
+
+        galleryPreviewItems.push({
+          file,
+          url:
+            URL.createObjectURL(
+              file
+            ),
+          existing: false
+        });
+      }
+    );
+
+    /*
+     * File input po změně znovu synchronizujeme.
+     */
+
+    syncGalleryInput();
+
+    renderGalleryPreview();
+  }
+);
+
+
+/* =========================================================
+   VÝBĚR / ZMĚNA DALŠÍCH INFORMACÍ
+   ========================================================= */
+
+$("infoStock")?.addEventListener(
+  "change",
+  e => {
+
+    if (e.target.checked) {
+      $("infoImport").checked = false;
+    }
+  }
+);
+
+
+$("infoImport")?.addEventListener(
+  "change",
+  e => {
+
+    if (e.target.checked) {
+      $("infoStock").checked = false;
+    }
+  }
+);
+
+
+/* =========================================================
+   OBRÁZKY – OPTIMALIZACE
    ========================================================= */
 
 async function prepareImage(
   file,
-  maxDimension=1600,
-  quality=0.78
-){
-  if(
+  maxDimension = 1600,
+  quality = 0.78
+) {
+
+  if (
     !file ||
-    !file.type.startsWith("image/")
-  ){
-    throw new Error("Soubor není obrázek.");
+    !file.type.startsWith(
+      "image/"
+    )
+  ) {
+
+    throw new Error(
+      "Soubor není obrázek."
+    );
   }
 
-  const objectUrl=URL.createObjectURL(file);
+  const objectUrl =
+    URL.createObjectURL(file);
 
-  try{
-    const img=await new Promise(
-      (resolve,reject)=>{
-        const el=new Image();
+  try {
 
-        el.onload=()=>resolve(el);
-        el.onerror=()=>
-          reject(
-            new Error(
-              "Obrázek se nepodařilo načíst."
-            )
-          );
+    const img =
+      await new Promise(
+        (resolve, reject) => {
 
-        el.src=objectUrl;
-      }
-    );
+          const el =
+            new Image();
 
-    const scale=Math.min(
-      1,
-      maxDimension/
-        Math.max(
-          img.naturalWidth,
-          img.naturalHeight
+          el.onload =
+            () => resolve(el);
+
+          el.onerror =
+            () =>
+              reject(
+                new Error(
+                  "Obrázek se nepodařilo načíst."
+                )
+              );
+
+          el.src =
+            objectUrl;
+        }
+      );
+
+    const scale =
+      Math.min(
+        1,
+        maxDimension /
+          Math.max(
+            img.naturalWidth,
+            img.naturalHeight
+          )
+      );
+
+    const canvas =
+      document.createElement(
+        "canvas"
+      );
+
+    canvas.width =
+      Math.max(
+        1,
+        Math.round(
+          img.naturalWidth *
+            scale
         )
-    );
+      );
 
-    const canvas=document.createElement("canvas");
+    canvas.height =
+      Math.max(
+        1,
+        Math.round(
+          img.naturalHeight *
+            scale
+        )
+      );
 
-    canvas.width=Math.max(
-      1,
-      Math.round(img.naturalWidth*scale)
-    );
-
-    canvas.height=Math.max(
-      1,
-      Math.round(img.naturalHeight*scale)
-    );
-
-    const ctx=canvas.getContext(
-      "2d",
-      {alpha:false}
-    );
+    const ctx =
+      canvas.getContext(
+        "2d",
+        {
+          alpha: false
+        }
+      );
 
     ctx.drawImage(
       img,
@@ -823,16 +1544,18 @@ async function prepareImage(
       canvas.height
     );
 
-    const blob=await new Promise(
-      resolve=>
-        canvas.toBlob(
-          resolve,
-          "image/webp",
-          quality
-        )
-    );
+    const blob =
+      await new Promise(
+        resolve =>
+          canvas.toBlob(
+            resolve,
+            "image/webp",
+            quality
+          )
+      );
 
-    if(!blob){
+    if (!blob) {
+
       throw new Error(
         "Optimalizaci obrázku se nepodařilo dokončit."
       );
@@ -841,67 +1564,99 @@ async function prepareImage(
     return new File(
       [blob],
       "foto.webp",
-      {type:"image/webp"}
+      {
+        type: "image/webp"
+      }
     );
 
-  }finally{
-    URL.revokeObjectURL(objectUrl);
+  } finally {
+
+    URL.revokeObjectURL(
+      objectUrl
+    );
   }
 }
 
 
-async function blobToBase64(file){
-  const bytes=await file.arrayBuffer();
+async function blobToBase64(
+  file
+) {
 
-  let binary="";
+  const bytes =
+    await file.arrayBuffer();
 
-  const arr=new Uint8Array(bytes);
+  let binary = "";
 
-  for(
-    let i=0;
-    i<arr.length;
-    i+=0x8000
-  ){
-    binary+=String.fromCharCode(
-      ...arr.subarray(
-        i,
-        i+0x8000
-      )
+  const arr =
+    new Uint8Array(
+      bytes
     );
+
+  for (
+    let i = 0;
+    i < arr.length;
+    i += 0x8000
+  ) {
+
+    binary +=
+      String.fromCharCode(
+        ...arr.subarray(
+          i,
+          i + 0x8000
+        )
+      );
   }
 
-  return btoa(binary);
+  return btoa(
+    binary
+  );
 }
 
 
 async function uploadImage(
   file,
   slug,
-  suffix="",
-  maxDimension=1600,
-  quality=0.78
-){
-  const optimized=
+  suffix = "",
+  maxDimension = 1600,
+  quality = 0.78
+) {
+
+  const optimized =
     await prepareImage(
       file,
       maxDimension,
       quality
     );
 
-  const safe=
+  const safe =
     (
       file.name
-        .replace(/\.[^.]+$/," ")
+        .replace(
+          /\.[^.]+$/,
+          " "
+        )
         .trim()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g,"")
-        .replace(/[^a-zA-Z0-9_-]+/g,"-")
-        .replace(/^-|-$/g,"")
-        .slice(0,60)
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        )
+        .replace(
+          /[^a-zA-Z0-9_-]+/g,
+          "-"
+        )
+        .replace(
+          /^-|-$/g,
+          ""
+        )
+        .slice(
+          0,
+          60
+        )
       || "foto"
     );
 
-  const content=
+  const content =
     await blobToBase64(
       optimized
     );
@@ -909,77 +1664,22 @@ async function uploadImage(
   return api(
     "/api/admin/images",
     {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
+      method: "POST",
+      headers: {
+        "Content-Type":
+          "application/json"
       },
-      body:JSON.stringify({
+      body: JSON.stringify({
         slug,
+
         filename:
           `${safe}-${Date.now()}${suffix}.webp`,
+
         content
       })
     }
   );
 }
-
-
-function showMainPreview(file){
-  const box=$("mainPreview");
-
-  if(!box)return;
-
-  if(!file){
-    box.innerHTML="";
-    return;
-  }
-
-  const url=
-    URL.createObjectURL(file);
-
-  box.innerHTML=
-    `<img class="thumb" src="${url}" alt="Náhled hlavní fotografie">`;
-
-  const img=
-    box.querySelector("img");
-
-  img.onload=()=>{
-    URL.revokeObjectURL(url);
-  };
-}
-
-
-/* =========================================================
-   DALŠÍ INFO
-   ========================================================= */
-
-$("infoStock")?.addEventListener(
-  "change",
-  e=>{
-    if(e.target.checked){
-      $("infoImport").checked=false;
-    }
-  }
-);
-
-$("infoImport")?.addEventListener(
-  "change",
-  e=>{
-    if(e.target.checked){
-      $("infoStock").checked=false;
-    }
-  }
-);
-
-
-$("mainImage")?.addEventListener(
-  "change",
-  e=>{
-    showMainPreview(
-      e.target.files[0]||null
-    );
-  }
-);
 
 
 /* =========================================================
@@ -988,7 +1688,8 @@ $("mainImage")?.addEventListener(
 
 $("productForm").addEventListener(
   "submit",
-  async e=>{
+  async e => {
+
     e.preventDefault();
 
     updatePayload();
@@ -999,80 +1700,110 @@ $("productForm").addEventListener(
       true
     );
 
-    try{
-      const name=
-        $("name").value.trim();
+    try {
 
-      const slug=
+      const name =
+        $("name")
+          .value
+          .trim();
+
+      const slug =
         slugify(name);
 
-      if(!slug){
+      if (!slug) {
+
         throw new Error(
           "Zadej název přívěsu."
         );
       }
 
-      const old=
+      const old =
         currentProduct;
 
-      const mainFile=
-        $("mainImage").files[0];
+      const mainFile =
+        $("mainImage")
+          .files[0];
 
-      const galleryFiles=
-        [...galleryPreviewItems]
-          .map(x=>x.file);
+      /*
+       * ==================================================
+       * GALERIE
+       *
+       * galleryPreviewItems je nyní jediný zdroj pravdy.
+       *
+       * Obsahuje:
+       *
+       * existing = true
+       * -> již uložená fotografie
+       *
+       * existing = false
+       * -> nově vybraná fotografie
+       *
+       * Pořadí tohoto pole = výsledné pořadí galerie.
+       * ==================================================
+       */
 
-      const total=
-        $("totalWeight").value===""
+      const galleryItems =
+        [...galleryPreviewItems];
+
+      const total =
+        $("totalWeight").value === ""
           ? null
           : Number(
               $("totalWeight").value
             );
 
-      const operating=
-        $("weight").value===""
+      const operating =
+        $("weight").value === ""
           ? null
           : Number(
               $("weight").value
             );
 
-      const payload=
+      const payload =
         (
-          total!==null &&
-          operating!==null &&
+          total !== null &&
+          operating !== null &&
           Number.isFinite(total) &&
           Number.isFinite(operating)
         )
-          ? total-operating
+          ? total - operating
           : null;
 
-      const product={
-        nombre:name,
+      const product = {
+
+        nombre:
+          name,
 
         precio:
-          (
-            String(
-              $("category").value
-            ).toLowerCase()==="ostatni"
-          )
+          String(
+            $("category").value
+          ).toLowerCase() ===
+          "ostatni"
+
             ? "PRODÁNO"
-            : $("price").value.trim(),
+
+            : $("price")
+                .value
+                .trim(),
 
         puvodniCena:
-          (
-            String(
-              $("category").value
-            ).toLowerCase()==="ostatni"
-          )
+          String(
+            $("category").value
+          ).toLowerCase() ===
+          "ostatni"
+
             ? (
                 old?.puvodniCena ||
                 (
                   old?.precio &&
-                  old.precio!=="PRODÁNO"
+                  old.precio !==
+                    "PRODÁNO"
+
                     ? old.precio
                     : null
                 )
               )
+
             : null,
 
         categoria:
@@ -1081,7 +1812,8 @@ $("productForm").addEventListener(
         vyrobce:
           (
             $("manufacturerCustom")
-              .value.trim()
+              .value
+              .trim()
             ||
             $("manufacturerSelect")
               .value
@@ -1089,12 +1821,16 @@ $("productForm").addEventListener(
 
         rokVyroby:
           $("year").value
-            ? Number($("year").value)
+            ? Number(
+                $("year").value
+              )
             : null,
 
         rokVyrobyMesic:
           $("month").value
-            ? Number($("month").value)
+            ? Number(
+                $("month").value
+              )
             : null,
 
         provozniHmotnostKg:
@@ -1107,85 +1843,127 @@ $("productForm").addEventListener(
           payload,
 
         stk:
-          $("stk").value.trim(),
+          $("stk")
+            .value
+            .trim(),
 
-        vybava:[
-          ...new Set([
-            ...(
-              old &&
-              Array.isArray(old.vybava)
-                ? old.vybava.filter(
-                    item=>
-                      !equipmentOptions.some(
-                        opt=>
-                          opt.toLocaleLowerCase("cs-CZ")===
-                          String(item).toLocaleLowerCase("cs-CZ")
-                      )
-                  )
-                : []
-            ),
-
-            ...[
-              ...$("equipment")
-                .querySelectorAll(
-                  'input[type="checkbox"]:checked'
+        vybava:
+          [
+            ...new Set([
+              ...(
+                old &&
+                Array.isArray(
+                  old.vybava
                 )
-            ].map(
-              cb=>cb.value
-            )
-          ])
-        ],
+                  ? old.vybava.filter(
+                      item =>
+                        !equipmentOptions.some(
+                          opt =>
+                            opt.toLocaleLowerCase(
+                              "cs-CZ"
+                            ) ===
+                            String(item)
+                              .toLocaleLowerCase(
+                                "cs-CZ"
+                              )
+                        )
+                    )
+                  : []
+              ),
+
+              ...[
+                ...$("equipment")
+                  .querySelectorAll(
+                    'input[type="checkbox"]:checked'
+                  )
+              ].map(
+                cb =>
+                  cb.value
+              )
+            ])
+          ],
 
         dalsiInfoTyp:
-          $("infoStock").checked
+          $("infoStock")
+            .checked
+
             ? "skladem"
+
             : (
-                $("infoImport").checked
+                $("infoImport")
+                  .checked
                   ? "import"
                   : ""
               ),
 
         dalsiInfoSkladem:
           $("infoStockText")
-            .value.trim(),
+            .value
+            .trim(),
 
         dalsiInfoImport:
           $("infoImportText")
-            .value.trim()
+            .value
+            .trim()
       };
 
-      if(old?.dalsi!==undefined){
-        product.dalsi=old.dalsi;
+
+      /*
+       * Zachování starých údajů
+       */
+
+      if (
+        old?.dalsi !== undefined
+      ) {
+
+        product.dalsi =
+          old.dalsi;
       }
 
-      if(old?.datumPridani){
-        product.datumPridani=
+      if (
+        old?.datumPridani
+      ) {
+
+        product.datumPridani =
           old.datumPridani;
       }
 
-      if(old?.imagen){
-        product.imagen=
+      if (
+        old?.imagen
+      ) {
+
+        product.imagen =
           old.imagen;
       }
 
-      if(old?.imagenMiniatura){
-        product.imagenMiniatura=
+      if (
+        old?.imagenMiniatura
+      ) {
+
+        product.imagenMiniatura =
           old.imagenMiniatura;
       }
 
-      if(old?.galeria){
-        product.galeria=
-          old.galeria;
-      }
 
-      if(!product.imagen && !mainFile){
+      /*
+       * ==================================================
+       * HLAVNÍ FOTOGRAFIE
+       * ==================================================
+       */
+
+      if (
+        !product.imagen &&
+        !mainFile
+      ) {
+
         throw new Error(
           "Vyber hlavní fotografii."
         );
       }
 
-      if(mainFile){
-        const r=
+      if (mainFile) {
+
+        const r =
           await uploadImage(
             mainFile,
             slug,
@@ -1194,10 +1972,10 @@ $("productForm").addEventListener(
             0.80
           );
 
-        product.imagen=
+        product.imagen =
           r.url;
 
-        const thumb=
+        const thumb =
           await uploadImage(
             mainFile,
             slug,
@@ -1206,57 +1984,131 @@ $("productForm").addEventListener(
             0.76
           );
 
-        product.imagenMiniatura=
+        product.imagenMiniatura =
           thumb.url;
       }
 
-      if(galleryFiles.length){
-        product.galeria=
-          product.galeria||[];
 
-        for(
-          const f of galleryFiles
-        ){
-          const r=
+      /*
+       * ==================================================
+       * GALERIE – NOVÉ FOTOGRAFIE
+       * ==================================================
+       *
+       * Existující fotky pouze ponecháme.
+       *
+       * Nové fotky nahrajeme a nahradíme
+       * jejich položku URL adresou.
+       *
+       * Výsledkem je přesně stejné pořadí,
+       * jaké je nyní v galleryPreviewItems.
+       * ==================================================
+       */
+
+      const finalGallery = [];
+
+      for (
+        const item of galleryItems
+      ) {
+
+        /*
+         * STARÁ FOTOGRAFIE
+         */
+
+        if (
+          item.existing &&
+          item.url
+        ) {
+
+          finalGallery.push({
+            imagen: item.url
+          });
+
+          continue;
+        }
+
+
+        /*
+         * NOVÁ FOTOGRAFIE
+         */
+
+        if (item.file) {
+
+          const r =
             await uploadImage(
-              f,
+              item.file,
               slug
             );
 
-          product.galeria.push({
-            imagen:r.url
+          finalGallery.push({
+            imagen: r.url
           });
         }
       }
 
-      const r=
+
+      /*
+       * TADY JE KLÍČOVÁ OPRAVA:
+       *
+       * Galerie se vždy uloží znovu v přesném
+       * pořadí finalGallery.
+       *
+       * Pokud uživatel nějakou fotku odstranil,
+       * v poli už není.
+       *
+       * Pokud změnil pořadí,
+       * je zde nové pořadí.
+       */
+
+      product.galeria =
+        finalGallery;
+
+
+      /*
+       * ULOŽENÍ PRODUKTU
+       */
+
+      const r =
         await api(
           "/api/admin/products",
           {
-            method:"POST",
-            headers:{
+            method: "POST",
+
+            headers: {
               "Content-Type":
                 "application/json"
             },
-            body:JSON.stringify({
-              slug,
-              originalSlug:
-                old?.slug||"",
-              product
-            })
+
+            body:
+              JSON.stringify({
+                slug,
+
+                originalSlug:
+                  old?.slug || "",
+
+                product
+              })
           }
         );
 
+
       setStatus(
         $("saveStatus"),
-        r.message,
+        r.message ||
+          "Přívěs byl uložen.",
         true
       );
 
-      resetForm();
-      loadProducts();
 
-    }catch(err){
+      /*
+       * Vyčistíme formulář až po úspěšném uložení.
+       */
+
+      resetForm();
+
+      await loadProducts();
+
+    } catch (err) {
+
       setStatus(
         $("saveStatus"),
         err.message
@@ -1267,171 +2119,466 @@ $("productForm").addEventListener(
 
 
 /* =========================================================
-   GALERIE – NÁHLED A ŘAZENÍ
+   ŘAZENÍ PŘÍVĚSŮ
    ========================================================= */
 
-let galleryPreviewItems=[];
-let galleryDragIndex=null;
+async function saveProductOrder(
+  order
+) {
 
-
-function renderGalleryPreview(){
-  const box=$("galleryPreview");
-
-  if(!box)return;
-
-  box.innerHTML="";
-
-  galleryPreviewItems.forEach(
-    (item,i)=>{
-      const el=
-        document.createElement("div");
-
-      el.className=
-        "gallery-item";
-
-      el.draggable=true;
-
-      const img=
-        document.createElement("img");
-
-      img.src=item.url;
-      img.alt=
-        "Náhled "+(i+1);
-
-      const pos=
-        document.createElement("div");
-
-      pos.className=
-        "gallery-pos";
-
-      pos.textContent=
-        "Pozice "+(i+1);
-
-      const rm=
-        document.createElement("button");
-
-      rm.type="button";
-      rm.className=
-        "gallery-remove";
-
-      rm.textContent="×";
-
-      rm.onclick=e=>{
-        e.stopPropagation();
-
-        galleryPreviewItems.splice(
-          i,
-          1
-        );
-
-        syncGalleryInput();
-        renderGalleryPreview();
-      };
-
-      el.append(
-        img,
-        pos,
-        rm
-      );
-
-      el.ondragstart=()=>{
-        galleryDragIndex=i;
-        el.classList.add("dragging");
-      };
-
-      el.ondragend=()=>{
-        galleryDragIndex=null;
-        el.classList.remove("dragging");
-      };
-
-      el.ondragover=e=>{
-        e.preventDefault();
-      };
-
-      el.ondrop=e=>{
-        e.preventDefault();
-
-        if(
-          galleryDragIndex===null ||
-          galleryDragIndex===i
-        ){
-          return;
-        }
-
-        const x=
-          galleryPreviewItems.splice(
-            galleryDragIndex,
-            1
-          )[0];
-
-        galleryPreviewItems.splice(
-          i,
-          0,
-          x
-        );
-
-        syncGalleryInput();
-        renderGalleryPreview();
-      };
-
-      box.appendChild(el);
-    }
+  setStatus(
+    $("saveStatus"),
+    "Ukládám nové pořadí přívěsů...",
+    true
   );
-}
 
+  const data =
+    await api(
+      "/api/admin/products",
+      {
+        method: "POST",
 
-function syncGalleryInput(){
-  const input=$("gallery");
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-  if(!input)return;
-
-  const dt=
-    new DataTransfer();
-
-  galleryPreviewItems.forEach(
-    x=>{
-      if(x.file){
-        dt.items.add(x.file);
+        body:
+          JSON.stringify({
+            order
+          })
       }
-    }
-  );
+    );
 
-  input.files=
-    dt.files;
+  setStatus(
+    $("saveStatus"),
+    data.message ||
+      "Pořadí přívěsů bylo uloženo.",
+    true
+  );
 }
 
 
-$("gallery")?.addEventListener(
-  "change",
-  e=>{
-    galleryPreviewItems=
-      Array.from(
-        e.target.files||[]
-      )
-      .filter(
-        f=>f.type.startsWith("image/")
-      )
-      .map(
-        f=>({
-          file:f,
-          url:URL.createObjectURL(f)
-        })
+function setupProductDrag() {
+
+  const box =
+    $("products");
+
+  if (!box) return;
+
+  box
+    .querySelectorAll(
+      ".product"
+    )
+    .forEach(item => {
+
+      if (
+        item.dataset.dragReady ===
+        "1"
+      ) {
+        return;
+      }
+
+      item.dataset.dragReady =
+        "1";
+
+      item.draggable = true;
+
+      item.addEventListener(
+        "dragstart",
+        e => {
+
+          if (
+            e.target.closest(
+              "button"
+            )
+          ) {
+
+            e.preventDefault();
+
+            return;
+          }
+
+          item.classList.add(
+            "dragging"
+          );
+
+          e.dataTransfer.effectAllowed =
+            "move";
+        }
       );
 
-    renderGalleryPreview();
-  }
-);
+      item.addEventListener(
+        "dragover",
+        e => {
+
+          e.preventDefault();
+
+          item.classList.add(
+            "drag-over"
+          );
+
+          e.dataTransfer.dropEffect =
+            "move";
+        }
+      );
+
+      item.addEventListener(
+        "dragleave",
+        () => {
+
+          item.classList.remove(
+            "drag-over"
+          );
+        }
+      );
+
+      item.addEventListener(
+        "drop",
+        async e => {
+
+          e.preventDefault();
+
+          const source =
+            box.querySelector(
+              ".product.dragging"
+            );
+
+          if (
+            !source ||
+            source === item
+          ) {
+
+            item.classList.remove(
+              "drag-over"
+            );
+
+            return;
+          }
+
+          const r =
+            item.getBoundingClientRect();
+
+          if (
+            e.clientY >
+            r.top +
+            r.height / 2
+          ) {
+
+            box.insertBefore(
+              source,
+              item.nextSibling
+            );
+
+          } else {
+
+            box.insertBefore(
+              source,
+              item
+            );
+          }
+
+          box
+            .querySelectorAll(
+              ".dragging,.drag-over"
+            )
+            .forEach(x => {
+
+              x.classList.remove(
+                "dragging",
+                "drag-over"
+              );
+            });
+
+          const order =
+            [
+              ...box.querySelectorAll(
+                ".product"
+              )
+            ]
+              .map(
+                x =>
+                  x.dataset.slug
+              )
+              .filter(Boolean);
+
+          try {
+
+            await saveProductOrder(
+              order
+            );
+
+            await loadProducts();
+
+          } catch (err) {
+
+            alert(
+              err.message
+            );
+
+            await loadProducts();
+          }
+        }
+      );
+
+      item.addEventListener(
+        "dragend",
+        () => {
+
+          item.classList.remove(
+            "dragging",
+            "drag-over"
+          );
+
+          box
+            .querySelectorAll(
+              ".drag-over"
+            )
+            .forEach(x => {
+
+              x.classList.remove(
+                "drag-over"
+              );
+            });
+        }
+      );
+    });
+}
 
 
 /* =========================================================
-   START ADMINISTRACE
+   PRODUKTY
    ========================================================= */
 
-(async()=>{
-  try{
-    await api("/api/admin/me");
-    showApp();
-  }catch{
+async function loadProducts() {
+
+  try {
+
+    const data =
+      await api(
+        "/api/admin/products"
+      );
+
+    $("products").innerHTML =
+      data.products.length
+
+        ? data.products
+            .map(
+              p => `
+
+                <div
+                  class="product"
+                  draggable="true"
+                  data-slug="${escapeAttr(
+                    p.slug || ""
+                  )}"
+                >
+
+                  <span
+                    class="drag-handle"
+                    title="Přetáhni pro změnu pořadí"
+                  >
+                    ☷
+                  </span>
+
+                  <img
+                    src="${p.imagen || ""}"
+                    onerror="this.style.visibility='hidden'"
+                  >
+
+                  <div>
+
+                    <strong>
+                      ${escapeHtml(
+                        p.nombre ||
+                        "Bez názvu"
+                      )}
+                    </strong>
+
+                    <div class="muted">
+
+                      ${escapeHtml(
+                        p.precio || ""
+                      )}
+
+                      ·
+
+                      ${escapeHtml(
+                        labelCat(
+                          p.categoria
+                        )
+                      )}
+
+                      <br>
+
+                      přidáno:
+
+                      ${
+                        p.datumPridani
+
+                          ? new Date(
+                              p.datumPridani
+                            )
+                              .toLocaleString(
+                                "cs-CZ"
+                              )
+
+                          : "neuvedeno"
+                      }
+
+                    </div>
+
+                  </div>
+
+                  <div
+                    class="actions row"
+                  >
+
+                    <button
+                      class="secondary"
+                      data-edit="${escapeAttr(
+                        p.slug
+                      )}"
+                    >
+                      Upravit
+                    </button>
+
+                    <button
+                      class="danger"
+                      data-delete="${escapeAttr(
+                        p.slug
+                      )}"
+                    >
+                      Smazat
+                    </button>
+
+                  </div>
+
+                </div>
+              `
+            )
+            .join("")
+
+        : "<p>Žádné přívěsy.</p>";
+
+
+    document
+      .querySelectorAll(
+        "[data-edit]"
+      )
+      .forEach(
+        b =>
+          b.onclick =
+            () =>
+              fillForm(
+                data.products.find(
+                  p =>
+                    p.slug ===
+                    b.dataset.edit
+                )
+              )
+      );
+
+
+    document
+      .querySelectorAll(
+        "[data-delete]"
+      )
+      .forEach(
+        b =>
+          b.onclick =
+            () =>
+              deleteProduct(
+                b.dataset.delete
+              )
+      );
+
+
+    setupProductDrag();
+
+  } catch (err) {
+
+    $("products").innerHTML =
+      `<p>${escapeHtml(
+        err.message
+      )}</p>`;
+  }
+}
+
+
+function labelCat(c) {
+
+  return c === "prepravniky"
+
+    ? "Přívěsy na koně"
+
+    : c === "nakladni-privesy"
+
+      ? "Nákladní přívěsy"
+
+      : "Prodané přívěsy";
+}
+
+
+async function deleteProduct(
+  slug
+) {
+
+  if (
+    !confirm(
+      "Opravdu smazat tento přívěs?"
+    )
+  ) {
+
+    return;
+  }
+
+  try {
+
+    await api(
+      "/api/admin/products/" +
+      encodeURIComponent(slug),
+      {
+        method: "DELETE"
+      }
+    );
+
+    if (
+      currentProduct?.slug ===
+      slug
+    ) {
+
+      resetForm();
+    }
+
+    await loadProducts();
+
+  } catch (err) {
+
+    alert(
+      err.message
+    );
+  }
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+(async () => {
+
+  try {
+
+    await api(
+      "/api/admin/me"
+    );
+
+    await showApp();
+
+  } catch {
+
     showLogin();
   }
+
 })();
