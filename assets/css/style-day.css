@@ -78,7 +78,7 @@ body {
 }
 
 /* ------------------------------
-    KATEGORÍAS – PC VERZE
+    KATEGORIE – PC VERZE
 ------------------------------ */
 .categorias .grid {
   display: grid;
@@ -246,6 +246,7 @@ body {
   cursor: pointer;
   transition: transform 0.2s;
 }
+
 .product-gallery img:hover { transform: scale(1.05); }
 
 /* ------------------------------
@@ -259,6 +260,7 @@ footer {
   border-top: 1px solid #e0e0e0;
   margin-top: 40px;
 }
+
 footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
 
 /* ------------------------------
@@ -399,6 +401,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   align-items: center;
   justify-content: center;
 }
+
 .slider-arrow.left { left: -60px !important; }
 .slider-arrow.right { right: -60px !important; }
 
@@ -426,6 +429,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   cursor: pointer;
   color: #1a1a1a;
 }
+
 .mobile-menu-toggle span {
   display: block;
   width: 28px;
@@ -434,6 +438,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   background: currentColor;
   border-radius: 2px;
 }
+
 @media (max-width: 768px) {
   .topbar {
     flex-direction: column !important;
@@ -441,7 +446,13 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
     gap: 4px !important;
     padding: 2px 2px 8px !important;
   }
-  .logo { width: 100% !important; display: flex !important; justify-content: center !important; }
+
+  .logo {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
   .logo img {
     display: block !important;
     width: calc(100vw - 4px) !important;
@@ -450,12 +461,14 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
     max-height: none !important;
     object-fit: contain !important;
   }
+
   .mobile-menu-toggle {
     display: block !important;
     align-self: center;
     width: 52px;
     height: 42px;
   }
+
   .topbar nav {
     display: none !important;
     width: 100%;
@@ -463,6 +476,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
     gap: 2px !important;
     align-items: stretch !important;
   }
+
   .topbar.menu-open nav { display: flex !important; }
   .topbar nav a { text-align: center; width: 100%; box-sizing: border-box; }
   body { padding-top: 145px !important; }
@@ -474,9 +488,31 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
 @media (max-width: 768px) {
   .topbar nav { display: none !important; }
   .topbar { flex-direction: column; gap: 10px; }
-  .slider-wrapper { display: block !important; max-width: 100% !important; margin-bottom: 15px !important; }
+  .slider-wrapper {
+    display: block !important;
+    max-width: 100% !important;
+    margin-bottom: 15px !important;
+  }
 
-  #nove-produkty, #produkty, .produkty-grid {
+  /* NOVĚ PŘIDANÉ – VŠECHNY PRODUKTY I NA MOBILU */
+  #nove-produkty {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 25px !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  #nove-produkty .produkt-card {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    min-width: 0 !important;
+  }
+
+  #produkty, .produkty-grid {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
@@ -493,7 +529,11 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
     flex-direction: column !important;
   }
 
-  .product-info .produkt-buttons { flex-direction: row !important; justify-content: center !important; }
+  .product-info .produkt-buttons {
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+
   .slider-arrow { display: none !important; }
 
   /* Kategorie mobil */
@@ -510,8 +550,16 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
 /* ============================================
    AKTUALIZACE – LOGO, GALERIE A LIGHTBOX
 ============================================ */
-.logo { flex: 0 1 auto; min-width: 0; }
-.logo a { display:block; line-height:0; }
+.logo {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.logo a {
+  display:block;
+  line-height:0;
+}
+
 .logo img {
   display:block;
   height:90px !important;
@@ -521,7 +569,11 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
 }
 
 /* Hlavní fotografie má stín přesně podle skutečného rozměru obrázku. */
-.product-page .left-col { width:100%; max-width:450px; }
+.product-page .left-col {
+  width:100%;
+  max-width:450px;
+}
+
 .product-page .product-image {
   width:100%;
   max-width:100%;
@@ -531,6 +583,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   line-height:0;
   background:transparent;
 }
+
 .product-page .product-image img {
   width:100%;
   max-width:100%;
@@ -539,6 +592,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   border-radius:10px;
   box-shadow:0 5px 15px rgba(0,0,0,.16);
 }
+
 .product-page .product-gallery {
   width:100%;
   max-width:100%;
@@ -548,6 +602,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   gap:10px;
   align-items:start;
 }
+
 .product-page .product-gallery img {
   width:100%;
   height:82px;
@@ -559,7 +614,10 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   border:2px solid transparent;
   box-shadow:0 2px 7px rgba(0,0,0,.10);
 }
-.product-page .product-gallery img.active { border-color:#1877F2; }
+
+.product-page .product-gallery img.active {
+  border-color:#1877F2;
+}
 
 /* Lightbox s ovládáním a posuvným pásem miniatur dole. */
 #lightbox {
@@ -576,7 +634,12 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   transition:opacity .25s;
   cursor:default;
 }
-#lightbox.show { display:flex; opacity:1; }
+
+#lightbox.show {
+  display:flex;
+  opacity:1;
+}
+
 #lightbox .lightbox-stage {
   width:100%;
   height:100%;
@@ -586,6 +649,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   padding:70px 80px 125px;
   box-sizing:border-box;
 }
+
 #lightbox-img {
   max-width:100%;
   max-height:100%;
@@ -596,6 +660,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   cursor:default;
   user-select:none;
 }
+
 .close-lightbox {
   position:absolute;
   top:12px;
@@ -607,6 +672,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   user-select:none;
   z-index:3;
 }
+
 .lightbox-nav {
   position:absolute;
   top:50%;
@@ -623,8 +689,10 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   z-index:3;
   box-shadow:0 4px 12px rgba(0,0,0,.25);
 }
+
 .lightbox-prev { left:18px; }
 .lightbox-next { right:18px; }
+
 .lightbox-strip {
   position:absolute;
   left:70px;
@@ -638,8 +706,16 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   box-sizing:border-box;
   scrollbar-width:auto;
 }
-.lightbox-strip::-webkit-scrollbar { height:9px; }
-.lightbox-strip::-webkit-scrollbar-thumb { background:rgba(255,255,255,.65); border-radius:8px; }
+
+.lightbox-strip::-webkit-scrollbar {
+  height:9px;
+}
+
+.lightbox-strip::-webkit-scrollbar-thumb {
+  background:rgba(255,255,255,.65);
+  border-radius:8px;
+}
+
 .lightbox-thumb {
   flex:0 0 78px;
   width:78px;
@@ -651,11 +727,23 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   cursor:pointer;
   box-sizing:border-box;
 }
-.lightbox-thumb.active { border-color:#fff; opacity:1; }
+
+.lightbox-thumb.active {
+  border-color:#fff;
+  opacity:1;
+}
 
 @media (max-width:768px) {
-  .topbar { padding:8px 10px !important; }
-  .logo { width:100%; display:flex; justify-content:center; }
+  .topbar {
+    padding:8px 10px !important;
+  }
+
+  .logo {
+    width:100%;
+    display:flex;
+    justify-content:center;
+  }
+
   .logo img {
     width:100% !important;
     height:auto !important;
@@ -663,21 +751,57 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
     max-height:95px;
     object-fit:contain;
   }
-  body { padding-top:115px; }
-  .product-page .left-col { max-width:100%; }
-  .product-page .product-gallery { gap:7px; }
-  .product-page .product-gallery img { height:auto; aspect-ratio:1.35/1; }
-  #lightbox .lightbox-stage { padding:55px 12px 120px; }
-  .lightbox-nav { width:42px; height:42px; font-size:24px; }
+
+  body {
+    padding-top:115px;
+  }
+
+  .product-page .left-col {
+    max-width:100%;
+  }
+
+  .product-page .product-gallery {
+    gap:7px;
+  }
+
+  .product-page .product-gallery img {
+    height:auto;
+    aspect-ratio:1.35/1;
+  }
+
+  #lightbox .lightbox-stage {
+    padding:55px 12px 120px;
+  }
+
+  .lightbox-nav {
+    width:42px;
+    height:42px;
+    font-size:24px;
+  }
+
   .lightbox-prev { left:8px; }
   .lightbox-next { right:8px; }
-  .lightbox-strip { left:10px; right:10px; bottom:10px; }
-  .lightbox-thumb { flex-basis:70px; width:70px; height:52px; }
+
+  .lightbox-strip {
+    left:10px;
+    right:10px;
+    bottom:10px;
+  }
+
+  .lightbox-thumb {
+    flex-basis:70px;
+    width:70px;
+    height:52px;
+  }
 }
 
 
 /* Prodané přívěsy – stejná typografie jako cena, pouze červená */
-.cena-prodano{color:#d00;font:inherit;font-weight:inherit;}
+.cena-prodano {
+  color:#d00;
+  font:inherit;
+  font-weight:inherit;
+}
 
 /* Rychlé načítání produktů – okamžitá vizuální odezva. */
 .products-loading {
@@ -687,6 +811,7 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   align-items: center;
   justify-content: center;
 }
+
 .products-loading span {
   width: 34px;
   height: 34px;
@@ -695,12 +820,21 @@ footer a { color: #1FAF3A; text-decoration: none; font-weight: 600; }
   border-radius: 50%;
   animation: products-spin .8s linear infinite;
 }
-@keyframes products-spin { to { transform: rotate(360deg); } }
+
+@keyframes products-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media (max-width:768px) {
   /* Na mobilu odstranit pouze horní navigaci a hamburger.
      Ostatní mobilní rozměry a mezery zůstávají původní. */
-  .topbar nav { display:none !important; }
-  .mobile-menu-toggle { display:none !important; }
-}
+  .topbar nav {
+    display:none !important;
+  }
 
+  .mobile-menu-toggle {
+    display:none !important;
+  }
+}
