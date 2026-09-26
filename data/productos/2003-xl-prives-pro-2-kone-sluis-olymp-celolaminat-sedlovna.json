@@ -11,21 +11,25 @@
   "uzitecnaHmotnostKg": 1170,
   "stk": "09/2028",
   "vybava": [
+    "stupačka",
+    "přepravník na 2 koně",
+    "celolaminát",
     "samostatná sedlovna",
     "krmný žlab",
+    "podlaha ve 100% stavu",
+    "brzdy ve 100% stavu",
     "celolitá pogumovaná podlaha",
-    "zadní rampa",
-    "plynové tlumiče na rampě",
-    "protiskluzová guma na rampě",
     "gumové boční okopy",
-    "nové pneumatiky",
     "odvětrací okna",
     "vnitřní osvětlení",
-    "plynové tlumiče 4x",
     "samonavíjecí zadní roletka",
-    "stupačka",
-    "podlaha ve 100% stavu",
-    "brzdy ve 100% stavu"
+    "zadní rampa",
+    "protiskluzová guma na rampě",
+    "plynové tlumiče na rampě",
+    "stupačka na rampě",
+    "plynové tlumiče 4x",
+    "nové pneumatiky",
+    "blatníky plast"
   ],
   "dalsiInfoTyp": "skladem",
   "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
@@ -77,6 +81,5 @@
       "imagen": "/img/galeria/2003-xl-prives-pro-2-kone-sluis-celolaminat-sedlovna/prives-na-kone-sluis_na-prodej_08-1790095063325.webp"
     }
   ],
-  "slug": "2003-xl-prives-pro-2-kone-sluis-olymp-celolaminat-sedlovna",
   "poradi": 0
 }
