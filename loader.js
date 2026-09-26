@@ -65,10 +65,9 @@ async function nactiNoveProdukty() {
   if (!cont) return;
 
   try {
-    const produkty = (await nactiVsechnyProdukty())
-      .filter(p => String(p.categoria || "").toLowerCase() !== "ostatni");
-    const limit = window.innerWidth < 768 ? 3 : 10;
-    vykresliKarty(produkty.slice(0, limit), "nove-produkty");
+const produkty = (await nactiVsechnyProdukty())
+  .filter(p => String(p.categoria || "").toLowerCase() === "prepravniky");
+vykresliKarty(produkty, "nove-produkty");
   } catch (e) {
     cont.innerHTML = "<p>Produkty se nepodařilo načíst.</p>";
   } finally {
