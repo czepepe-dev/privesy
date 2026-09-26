@@ -31,6 +31,7 @@ const DEFAULT_ITEMS = [
   "hydraulika"
 ];
 
+
 function cleanItems(items){
   const out = [];
   const seen = new Set();
@@ -53,8 +54,15 @@ function cleanItems(items){
   return out;
 }
 
+
+/* =========================================================
+   NAČTENÍ SEZNAMU
+   ========================================================= */
+
 async function readList(env){
+
   try{
+
     const file = await gh(PATH,env);
 
     const parsed = JSON.parse(
@@ -63,6 +71,20 @@ async function readList(env){
 
     const items = cleanItems(parsed?.items);
 
+    /*
+      Pokud soubor existuje, ale obsahuje prázdný seznam,
+      obnovíme výchozí seznam výbavy.
+    */
+
+    if(items.length === 0){
+
+      return {
+        items:DEFAULT_ITEMS.slice(),
+        sha:file.sha
+      };
+
+    }
+
     return {
       items,
       sha:file.sha
@@ -70,16 +92,24 @@ async function readList(env){
 
   }catch(e){
 
+    /*
+      Pokud data/vybava.json ještě neexistuje,
+      použijeme výchozí seznam.
+    */
+
     if(/404|Not Found/i.test(e.message || "")){
+
       return {
         items:DEFAULT_ITEMS.slice(),
         sha:null
       };
+
     }
 
     throw e;
   }
 }
+
 
 async function saveList(env,items,sha,message){
 
@@ -152,7 +182,6 @@ export async function onRequestPost({request,env}){
 
 
     /*
-      NOVÉ:
       Pokud admin pošle celé pole "items",
       jedná se o nové pořadí položek po přetažení.
     */
@@ -164,7 +193,7 @@ export async function onRequestPost({request,env}){
       const requested = cleanItems(body.items);
 
       /*
-        Pro jistotu zachováme i položky,
+        Zachováme i položky,
         které by admin omylem neposlal.
       */
 
@@ -202,7 +231,7 @@ export async function onRequestPost({request,env}){
 
 
     /*
-      PŮVODNÍ FUNKCE:
+      Původní funkce:
       přidání nové položky.
     */
 
