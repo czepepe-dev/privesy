@@ -113,7 +113,7 @@ async function cleanupImageDirs(
             },
             body:JSON.stringify({
               message:
-                `Odstraněn nepoužívaný obrázek ${f.path}`,
+                "Odstraněn nepoužívaný obrázek " + f.path,
               sha:f.sha,
               branch:BRANCH
             })
