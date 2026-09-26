@@ -320,7 +320,7 @@ export async function onRequestDelete({request,env}){
       env,
       items,
       current.sha,
-      `Odstraněna výbava/stav: ${removed}`
+      "Odstraněna výbava/stav: " + removed
     );
 
     return json({
