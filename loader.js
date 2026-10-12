@@ -29,24 +29,55 @@ function jeProdany(p) {
   );
 }
 
+async function cekej(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// GitHub Raw/CDN může krátce vracet starší verzi právě aktualizovaného indexu.
+// Opakujeme načtení s novou URL, místo abychom hned vykreslili prázdnou kategorii.
+async function fetchSOpakovanim(urlZaklad, pokusy = 4) {
+  let posledniChyba;
+
+  for (let pokus = 0; pokus < pokusy; pokus++) {
+    try {
+      const url = `${urlZaklad}${urlZaklad.includes("?") ? "&" : "?"}nocache=${Date.now()}-${pokus}`;
+      const resp = await fetch(url, { cache: "no-store" });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return resp;
+    } catch (e) {
+      posledniChyba = e;
+      if (pokus < pokusy - 1) await cekej(400 * (pokus + 1));
+    }
+  }
+
+  throw posledniChyba || new Error("Načtení se nezdařilo.");
+}
+
 async function ziskejSeznamSouboru() {
   const url =
     `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}` +
-    `/main/${PRODUCT_PATH}/index.json?v=${Date.now()}`;
+    `/main/${PRODUCT_PATH}/index.json`;
 
-  const resp = await fetch(url, { cache: "no-store" });
-  if (!resp.ok) {
-    throw new Error(`Seznam přívěsů se nepodařilo načíst (${resp.status}).`);
+  let posledniSeznam = [];
+
+  // Prázdný index může být krátce zastaralá kopie z CDN po aktualizaci.
+  for (let pokus = 0; pokus < 4; pokus++) {
+    const resp = await fetchSOpakovanim(url, 2);
+    const seznam = await resp.json();
+    if (!Array.isArray(seznam)) {
+      throw new Error("Seznam přívěsů má nesprávný formát.");
+    }
+
+    posledniSeznam = seznam
+      .filter(name => typeof name === "string" && name.toLowerCase().endsWith(".json") && name.toLowerCase() !== "index.json")
+      .map(name => ({ name, sha: "" }));
+
+    if (posledniSeznam.length > 0) return posledniSeznam;
+    if (pokus < 3) await cekej(500 * (pokus + 1));
   }
 
-  const seznam = await resp.json();
-  if (!Array.isArray(seznam)) {
-    throw new Error("Seznam přívěsů má nesprávný formát.");
-  }
-
-  return seznam
-    .filter(name => typeof name === "string" && name.toLowerCase().endsWith(".json") && name.toLowerCase() !== "index.json")
-    .map(name => ({ name, sha: "" }));
+  // Prázdný seznam se vrátí až po opakovaných pokusech.
+  return posledniSeznam;
 }
 
 async function nactiVsechnyProdukty() {
@@ -65,13 +96,7 @@ async function nactiVsechnyProdukty() {
           `/main/${PRODUCT_PATH}/${encodeURIComponent(file)}` +
           `?v=${Date.now()}`;
 
-        const resp = await fetch(url, {
-          cache: "no-store"
-        });
-
-        if (!resp.ok) {
-          throw new Error(`Nelze načíst ${file}`);
-        }
+        const resp = await fetchSOpakovanim(url, 3);
 
         const data = await resp.json();
 
@@ -93,7 +118,7 @@ async function nactiVsechnyProdukty() {
     })
   );
 
-  produktyCache = produkty
+  const nacteneProdukty = produkty
     .filter(Boolean)
     .sort((a, b) => {
       const aPoradi = Number(a.poradi);
@@ -131,7 +156,10 @@ async function nactiVsechnyProdukty() {
       );
     });
 
-  return produktyCache;
+  // Prázdný výsledek neukládáme do cache: po přechodné chybě
+  // se může další pokus na stejné stránce úspěšně načíst.
+  if (nacteneProdukty.length > 0) produktyCache = nacteneProdukty;
+  return nacteneProdukty;
 }
 
 async function nactiProdukty(kategorie) {
