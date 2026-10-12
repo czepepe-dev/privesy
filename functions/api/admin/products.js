@@ -561,6 +561,24 @@ export async function onRequestPost({
 
 
     /*
+      NOVÝ PRODUKT MUSÍ BÝT NA ZAČÁTKU SEZNAMU.
+      Starší produkty mohou mít ruční poradi, které
+      má ve veřejném webu přednost před datumPridani.
+      Proto novému produktu přiřadíme pořadí menší
+      než nejmenší existující platné pořadí.
+      Při editaci stávajícího produktu pořadí neměníme.
+    */
+    if(!oldProduct){
+      const existingProducts = await getAllProducts(env);
+      const existingPositions = existingProducts
+        .map(product => product?.poradi)
+        .filter(value => value !== null && value !== undefined && String(value).trim() !== "" && Number.isFinite(Number(value)))
+        .map(Number);
+      p.poradi = existingPositions.length ? Math.min(...existingPositions) - 1 : -1;
+    }
+
+
+    /*
       Při úpravě existujícího produktu
       zachováme jeho ruční pořadí.
     */
