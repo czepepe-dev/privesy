@@ -1,0 +1,31 @@
+{
+  "nombre": "test",
+  "precio": "45555",
+  "puvodniCena": null,
+  "categoria": "prepravniky",
+  "vyrobce": "Anssems (Nizozemsko)",
+  "rokVyroby": 2008,
+  "rokVyrobyMesic": null,
+  "provozniHmotnostKg": 222,
+  "celkovaHmotnostKg": 1252,
+  "uzitecnaHmotnostKg": 1030,
+  "stk": "",
+  "vybava": [
+    "přepravník na 2 koně",
+    "krmný žlab",
+    "lité disky",
+    "rezervní kolo"
+  ],
+  "dalsiInfoTyp": "skladem",
+  "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
+  "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
+  "imagen": "/img/galeria/test/default-nove-1791833361719.webp",
+  "imagenMiniatura": "/img/galeria/test/default-nove-1791833363658-thumb.webp",
+  "galeria": [
+    {
+      "imagen": "/img/galeria/test/hotra-1791833365267.webp"
+    }
+  ],
+  "datumPridani": "2026-10-12T19:29:27.100Z",
+  "poradi": -1
+}
