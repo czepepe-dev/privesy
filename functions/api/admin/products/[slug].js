@@ -1,4 +1,4 @@
-import {auth,json,gh,b64decode,BRANCH} from "../_shared.js";
+import {auth,json,gh,b64decode,b64encode,BRANCH} from "../_shared.js";
 
 function imagePathFromUrl(value){
   if(typeof value!=="string" || !value.trim()) return null;
@@ -13,7 +13,7 @@ function productImagePaths(p){
 function imageDirs(paths){const dirs=new Set();for(const path of paths){const i=path.lastIndexOf("/");if(i>0)dirs.add(path.slice(0,i));}return dirs;}
 async function getAllProducts(env){
   const files=await gh("data/productos",env); const products=[];
-  for(const f of files.filter(x=>x.type==="file"&&x.name.toLowerCase().endsWith(".json"))){
+  for(const f of files.filter(x=>x.type==="file"&&x.name.toLowerCase().endsWith(".json")&&x.name.toLowerCase()!=="index.json")){
     try{const raw=await gh(`data/productos/${encodeURIComponent(f.name)}`,env);const p=JSON.parse(b64decode(raw.content));p.slug=f.name.replace(/\.json$/i,"");products.push(p);}catch{}
   }
   return products;
@@ -26,7 +26,13 @@ async function cleanupImageDirs(env,dirs,protectedPaths){
     }
   }
 }
-
+async function updateProductIndex(env){
+  const files=await gh("data/productos",env);
+  const names=files.filter(f=>f.type==="file"&&f.name.toLowerCase().endsWith(".json")&&f.name.toLowerCase()!=="index.json").map(f=>f.name).sort((a,b)=>a.localeCompare(b));
+  let current=null;try{current=await gh("data/productos/index.json",env);}catch{}
+  if(current){try{const old=JSON.parse(b64decode(current.content));if(Array.isArray(old)&&JSON.stringify(old)===JSON.stringify(names))return;}catch{}}
+  await gh("data/productos/index.json",env,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:"Aktualizace seznamu přívěsů",content:b64encode(JSON.stringify(names,null,2)+"\n"),branch:BRANCH,...(current?.sha?{sha:current.sha}:{})})});
+}
 export async function onRequestDelete({request,env,params}){
   const a=await auth(request,env);if(a)return a;
   try{
@@ -34,8 +40,7 @@ export async function onRequestDelete({request,env,params}){
     const f=await gh(path,env); const product=JSON.parse(b64decode(f.content));
     const imagePaths=productImagePaths(product);
     await gh(path,env,{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:`Smazán přívěs ${slug}`,sha:f.sha,branch:BRANCH})});
-
-    // Smaž jen fotografie v adresářích tohoto produktu, které už nepoužívá jiný produkt.
+    await updateProductIndex(env);
     try{
       const others=await getAllProducts(env); const protectedPaths=new Set();
       for(const other of others){for(const x of productImagePaths(other))protectedPaths.add(x);}

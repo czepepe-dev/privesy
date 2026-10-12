@@ -30,31 +30,23 @@ function jeProdany(p) {
 }
 
 async function ziskejSeznamSouboru() {
-  try {
-    const url =
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}` +
-      `/contents/${PRODUCT_PATH}?ref=main`;
+  const url =
+    `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}` +
+    `/main/${PRODUCT_PATH}/index.json?v=${Date.now()}`;
 
-    const resp = await fetch(url, { cache: "no-store" });
-
-    if (!resp.ok) return [];
-
-    const files = await resp.json();
-
-    return files
-      .filter(
-        f =>
-          f.type === "file" &&
-          f.name.toLowerCase().endsWith(".json")
-      )
-      .map(f => ({
-        name: f.name,
-        sha: f.sha
-      }));
-  } catch (e) {
-    console.error("Nepodařilo se načíst seznam produktů:", e);
-    return [];
+  const resp = await fetch(url, { cache: "no-store" });
+  if (!resp.ok) {
+    throw new Error(`Seznam přívěsů se nepodařilo načíst (${resp.status}).`);
   }
+
+  const seznam = await resp.json();
+  if (!Array.isArray(seznam)) {
+    throw new Error("Seznam přívěsů má nesprávný formát.");
+  }
+
+  return seznam
+    .filter(name => typeof name === "string" && name.toLowerCase().endsWith(".json") && name.toLowerCase() !== "index.json")
+    .map(name => ({ name, sha: "" }));
 }
 
 async function nactiVsechnyProdukty() {
@@ -71,10 +63,10 @@ async function nactiVsechnyProdukty() {
         const url =
           `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}` +
           `/main/${PRODUCT_PATH}/${encodeURIComponent(file)}` +
-          `?v=${encodeURIComponent(entry.sha || "")}`;
+          `?v=${Date.now()}`;
 
         const resp = await fetch(url, {
-          cache: "force-cache"
+          cache: "no-store"
         });
 
         if (!resp.ok) {

@@ -4,7 +4,38 @@ const ALLOWED = new Set([
   "prepravniky",
   "nakladni-privesy",
   "ostatni"
-]);
+ ]);
+
+// Udržuje veřejný seznam produktových JSON souborů. Volá se přes autorizovanou
+// GitHub integraci, takže návštěvníci webu už nemusí používat GitHub Contents API.
+async function updateProductIndex(env){
+  const files = await gh("data/productos", env);
+  const names = files
+    .filter(f => f.type === "file" && f.name.toLowerCase().endsWith(".json") && f.name.toLowerCase() !== "index.json")
+    .map(f => f.name)
+    .sort((a,b) => a.localeCompare(b));
+
+  let current = null;
+  try { current = await gh("data/productos/index.json", env); } catch {}
+
+  if (current) {
+    try {
+      const old = JSON.parse(b64decode(current.content));
+      if (Array.isArray(old) && JSON.stringify(old) === JSON.stringify(names)) return;
+    } catch {}
+  }
+
+  await gh("data/productos/index.json", env, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "Aktualizace seznamu přívěsů",
+      content: b64encode(JSON.stringify(names, null, 2) + "\n"),
+      branch: BRANCH,
+      ...(current?.sha ? { sha: current.sha } : {})
+    })
+  });
+}
 
 /* =========================================================
    OBRÁZKY
@@ -264,6 +295,7 @@ export async function onRequestGet({
 
   try{
 
+    await updateProductIndex(env);
     const products=
       await getAllProducts(env);
 
@@ -438,6 +470,7 @@ async function saveProductOrder(
 
 
 
+  await updateProductIndex(env);
   return sortProducts(products);
 }
 
@@ -726,6 +759,7 @@ export async function onRequestPost({
 
 
 
+    await updateProductIndex(env);
     return json({
       ok:true,
       message:
