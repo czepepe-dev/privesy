@@ -1,8 +1,8 @@
 {
   "nombre": "2004 Hlinikový přívěs HOTRA pro 2 koně se sedlovnou",
-  "precio": "79.000,-Kč",
-  "puvodniCena": null,
-  "categoria": "prepravniky",
+  "precio": "PRODÁNO",
+  "puvodniCena": "79.000,-Kč",
+  "categoria": "ostatni",
   "vyrobce": "Hotra (Nizozemsko)",
   "rokVyroby": 2004,
   "rokVyrobyMesic": 2,
@@ -11,21 +11,21 @@
   "uzitecnaHmotnostKg": 1110,
   "stk": "",
   "vybava": [
+    "stupačka",
+    "podlaha ve 100% stavu",
     "samostatná sedlovna",
-    "zadní rampa",
-    "plynové tlumiče na rampě",
-    "protiskluzová guma na rampě",
+    "boky a zadní rampa hliník",
+    "ochranná guma na podlaze",
     "gumové boční okopy",
-    "nové pneumatiky",
     "odvětrací okna",
     "vnitřní osvětlení",
-    "blatníky plast",
     "samonavíjecí zadní roletka",
-    "stupačka",
     "opěrné kolečko",
-    "ochranná guma na podlaze",
-    "boky a zadní rampa hliník",
-    "podlaha ve 100% stavu"
+    "zadní rampa",
+    "protiskluzová guma na rampě",
+    "plynové tlumiče na rampě",
+    "nové pneumatiky",
+    "blatníky plast"
   ],
   "dalsiInfoTyp": "skladem",
   "dalsiInfoSkladem": "NUTNÁ OPRAVA - VÝMĚNA všech 4 brzdových obložení.\nJinak velmi dobrý stav, podlaha + rampa 100%.\n\nPřívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta veškerá dokumentace pro registr vozidel.",
@@ -68,6 +68,5 @@
       "imagen": "/img/galeria/2004-hlinikovy-prives-hotra-pro-2-kone-se-sedlovnou/prives-na-kone-alu-hotra-celohlinikovy_na-prodej_06-1790101210155.webp"
     }
   ],
-  "slug": "2004-hlinikovy-prives-hotra-pro-2-kone-se-sedlovnou",
   "poradi": 4
 }
