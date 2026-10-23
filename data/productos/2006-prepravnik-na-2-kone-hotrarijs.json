@@ -1,0 +1,42 @@
+{
+  "nombre": "2006 Přepravník na 2 koně HOTRARIJS",
+  "precio": "69.000,-Kč",
+  "puvodniCena": null,
+  "categoria": "prepravniky",
+  "vyrobce": "Hotra (Nizozemsko)",
+  "rokVyroby": 2006,
+  "rokVyrobyMesic": 7,
+  "provozniHmotnostKg": 700,
+  "celkovaHmotnostKg": 2000,
+  "uzitecnaHmotnostKg": 1300,
+  "stk": "",
+  "vybava": [
+    "přepravník na 2 koně",
+    "podlaha ve 100% stavu",
+    "brzdy ve 100% stavu",
+    "boky a zadní rampa voděodolná překližka",
+    "celolitá pogumovaná podlaha",
+    "gumové boční okopy",
+    "odvětrací okna",
+    "vnitřní osvětlení",
+    "samonavíjecí zadní roletka",
+    "opěrné kolečko",
+    "zadní rampa",
+    "protiskluzová guma na rampě",
+    "plynové tlumiče na rampě",
+    "stupačka na rampě",
+    "blatníky pozink"
+  ],
+  "dalsiInfoTyp": "skladem",
+  "dalsiInfoSkladem": "Přívěs je skladem k prohlídce a odběru Veselí nad Lužnicí, okres Tábor (viz. KONTAKT). V ceně přívěsu je zahrnuta nová STK a veškerá dokumentace pro registr vozidel.",
+  "dalsiInfoImport": "Přívěs je skladem v Nizozemsku. Lze dovézt pouze na zakázku po složení zálohy. V ceně přívěsu je zahrnuta doprava do ČR, nová STK a veškerá dokumentace pro registr vozidel.",
+  "datumPridani": "2026-10-12T17:02:02.847Z",
+  "imagen": "/img/galeria/nove-2006-kvalitni-prives-pro-2-kone-hotrarijs/hotra-1791830338895.webp",
+  "imagenMiniatura": "/img/galeria/nove-2006-kvalitni-prives-pro-2-kone-hotrarijs/hotra-1791830341415-thumb.webp",
+  "galeria": [
+    {
+      "imagen": "/img/galeria/nove-2006-kvalitni-prives-pro-2-kone-hotrarijs/default-nove-1791825482347.webp"
+    }
+  ],
+  "poradi": 2
+}
